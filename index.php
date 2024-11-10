@@ -46,8 +46,9 @@ $is_logged_in = isset($_SESSION['phone']);  // 전화번호가 세션에 저장�
         <a href="signin/logout.php">Log Out</a>
     <?php else: ?>
         <!-- 로그인 안 했을 때 -->
-        <a href="signin/signin.html">Sign In</a>
-        <a href="signup/signup.html">Sign Up</a>
+        <a href="restaurants/restaurants.html">Restaurant</a>
+        <a href="order.php">Order</a>
+        <a href="signin/signin.html">Sign In/Up</a>
     <?php endif; ?>
 </div>
 
