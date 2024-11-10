@@ -62,7 +62,7 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('get_restaurants.php')
+            fetch('restaurants.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.redirect) {
