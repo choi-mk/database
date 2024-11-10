@@ -1,7 +1,7 @@
 <?php
 // 로그인 처리 후
 session_start();
-//$_SESSION['phone'] = $phone; // 로그인한 사용자의 ID 저장
+
 // 데이터베이스 연결
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
 $username = "admin";
@@ -23,23 +23,17 @@ $result = $conn->query($sql);
 
 // 사용자가 존재하면 세션에 사용자 정보 저장 후 로그인 성공
 if ($result->num_rows > 0) {
+    // 사용자가 존재하면 닉네임도 가져옵니다
+    $row = $result->fetch_assoc();
     $_SESSION['phone'] = $phone;
-    echo "로그인 성공!<br>";
-    echo "<a href='welcome.php'>홈페이지로 이동</a>";
+    $_SESSION['nickname'] = $row['nickname']; // nickname 가져오기
+    
+    // 홈페이지로 리디렉션
+    header("Location: ../index.php");
+    exit(); // 이 코드 이후의 처리는 하지 않도록 종료
 } else {
     echo "전화번호가 잘못되었습니다.";
 }
 
 $conn->close();
-
-
-
-
-
-
-
-
-
-
-
 ?>
