@@ -13,10 +13,10 @@ if (empty($name) || empty($nickname) || empty($account) || empty($address) || em
 }
 
 // 예시: MySQL 데이터베이스에 데이터 저장 (DB 연결 코드 추가 필요)
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "my_database";
+$servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
+$username = "admin";
+$password = "00000000";
+$dbname = "moju";
 
 // DB 연결
 $conn = new mysqli($servername, $username, $password, $dbname);
