@@ -4,10 +4,9 @@ header('Content-Type: application/json');
 // login 확인
 session_start();
 
-if (isset($_SESSION['phone'])) {
-    echo "Logged in as  " . htmlspecialchars($_SESSION['phone']);
-} else {
-    echo json_encode(["redirect" => "login.php"]);
+if (!isset($_SESSION['phone'])) {
+    // 로그인되지 않은 경우 리디렉션 정보 반환
+    echo json_encode(["redirect" => "../signin/signin.php"]);
     exit;
 }
 
