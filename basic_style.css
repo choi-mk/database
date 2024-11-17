@@ -1,0 +1,172 @@
+/* 기본 색상 변수 설정 */
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
+
+
+
+
+:root {
+    --title-color: #b5cbed; 
+    --title-text-color: #000000; 
+    --subtitle-color:#86b7f0;
+    --subtitle-text-color:#ffffff;
+    --clicksubtitle-text-color:#1500ff;
+    --cursubtitle-text-color:#599cb4;
+    --order-color:#6f81f5;
+    --order-text-color:#02082c;
+    --clickorder-text-color:#cd951c;
+    --curorder-text-color:#6ff5b4;
+
+
+
+}
+
+body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color); /* 배경색 */
+    color: var(--text-color); /* 본문 텍스트 색상 */
+}
+
+header {
+    background-color: var(--title-color); /* 헤더 배경색 */
+    color: var(--title-text-color);
+    height: 80px; /* 헤더 크기 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+header h1 {
+    font-family: 'Sour Gummy', Arial, sans-serif;
+    font-size: 36px;
+    margin: 0;
+}
+
+header a {
+    color: var(--title-text-color);
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+nav {
+    background: var(--subtitle-color); /* 네이비 블루 */
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+nav a {
+    color: var(--subtitle-text-color);
+    text-decoration: none;
+    margin: 0 15px;
+    font-family: 'Sour Gummy', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav a:hover {
+    background-color: var(--subtitle-color); /* Secondary 색상으로 hover */
+    color: var(--clicksubtitle-text-color);
+}
+
+.nickname-block {
+    color: white;
+    font-weight: bold;
+    background-color: #444;
+    padding: 5px 10px;
+    border-radius: 5px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 12px;
+}
+
+.current-button {
+    font-weight: bold;
+    color:var(--cursubtitle-text-color); /* Secondary 색상 */
+}
+
+main {
+    padding: 20px;
+    background: #fff;
+    margin: 20px auto;
+    max-width: 1000px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-family: 'Exo 2', sans-serif;
+}
+
+.tab-bar {
+    display: flex;
+    justify-content: center;
+    background-color: var(--order-color); /* 밝은 회색 */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-bar a {
+    color: var(--order-text-color); /* 어두운 네이비 */
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 5px;
+    border-radius: 5px;
+    background-color: var(--order-color); /* 배경색: 라이트 그레이 */
+    transition: background-color 0.3s, color 0.3s;
+    font-family: 'DM Sans', Arial, sans-serif;
+}
+
+.tab-bar a:hover {
+    background-color:var(--order-color); /* 밝은 회색 */
+    color: var(--clickorder-text-color);
+}
+
+.tab-bar .cur-button {
+    background-color: var(--order-color); /* Secondary 색상 */
+    color: var(--curorder-text-color);
+    font-weight: bold;
+}
+
+.my-orders-title {
+    font-size: 28px; /* 제목 크기 조정 */
+    color: var(--primary-color); /* Primary 색상 */
+    text-align: center; /* 가운데 정렬 */
+    margin-bottom: 20px; /* 제목과 내용 간 간격 */
+    border-bottom: 2px solid var(--secondary-color); /* 밑줄 추가 */
+    padding-bottom: 10px; /* 밑줄과의 간격 */
+}
+
+
+
+
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: #F9F9F9;
+    color: #333;
+    font-weight: bold;
+}

@@ -5,125 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders</title>
     <link rel = "stylesheet" href = "https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            height: 100px; /* header 크기 50px로 설정 */
-            display: flex; /* flexbox로 중앙 정렬 */
-            justify-content: center; /* 수평 중앙 정렬 */
-            align-items: center; /* 수직 중앙 정렬 */
-            text-align: center; /* 텍스트 수평 중앙 정렬 */
-        }
-
-        header h1 {
-            font-family: 'Sour Gummy';
-            font-size: 40px; /* 글자 크기 조정 (기본값보다 작게 설정) */
-            margin: 0; /* h1 태그의 기본 마진을 제거 */
-        }
-
-        header a {
-            color: white; /* 링크 텍스트 색상 */
-            text-decoration: none; /* 링크의 기본 밑줄 제거 */
-        }
-
-        /* 클릭 시 색상 변화 없도록 */
-        header a:hover {
-            text-decoration: none; /* 호버 시 밑줄 표시 안 함 */
-            color: white; /* 클릭 시 색상 변경 없도록 유지 */
-        }
-
-        nav {
-            background: #555;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-family: 'Sour Gummy';
-            font-size: 20px;
-            font-weight: 100;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        .orders-button {
-            font-weight: bold; /* 글씨를 더 진하게 */
-            color: #ffcc00; /* 원하는 색상으로 변경 */
-        }
-
-        main {
-            padding: 20px;
-            background: #fff;
-            margin: 20px auto;
-            max-width: 1200px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background: #333;
-            color: #fff;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .tab-bar {
-            display: flex;
-            justify-content: center;
-            background-color: #ddd;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .tab-bar a {
-            color: #333;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 5px;
-            border-radius: 5px;
-            background-color: #eee;
-        }
-
-        .tab-bar a:hover {
-            background-color: #ccc;
-        }
-
-        .tab-bar .neworder-button {
-            background-color: #ffcc00; /* 원하는 색상으로 배경 색상 변경 */
-            color: white; /* 텍스트 색상 변경 */
-            font-weight: bold; /* 글씨 두껍게 */
-        }
-
-        .nickname-block {
-            color: white;
-            font-weight: bold;
-            background-color: #444;
-            padding: 5px 10px;
-            border-radius: 5px;
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 12px;
-        }
-    </style>
+    <link rel="stylesheet" href="../basic_style.css">
 </head>
 <body>
 
@@ -135,12 +17,12 @@
 
     <nav>
         <a href="../restaurants/restaurants.html" class="restaurants-button">Restaurants</a>
-        <a href="orders.html" class="orders-button">Orders</a>
+        <a href="orders.html" class="current-button">Orders</a>
         <a href="../signin/logout.php" class="logout-button">Logout</a>
     </nav>
 
     <div class="tab-bar">
-        <a href="orders.html" class="neworder-button">Create New Order</a>
+        <a href="orders.html" class="cur-button">Create New Order</a>
         <a href="myorders/myorders.php" class="myorders-button">My Orders</a>
     </div>
     

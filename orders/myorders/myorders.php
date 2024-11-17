@@ -54,142 +54,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        header h1 {
-            font-family: 'Sour Gummy';
-            font-size: 40px;
-            margin: 0;
-        }
-
-        header a {
-            color: white;
-            text-decoration: none;
-        }
-
-        header a:hover {
-            text-decoration: none;
-            color: white;
-        }
-
-        nav {
-            background: #555;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-family: 'Sour Gummy';
-            font-size: 20px;
-            font-weight: 100;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        .orders-button {
-            font-weight: bold;
-            color: #ffcc00;
-        }
-
-        main {
-            padding: 20px;
-            background: #fff;
-            margin: 20px auto;
-            max-width: 1200px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background: #333;
-            color: #fff;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .tab-bar {
-            display: flex;
-            justify-content: center;
-            background-color: #ddd;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .tab-bar a {
-            color: #333;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 0 5px;
-            border-radius: 5px;
-            background-color: #eee;
-        }
-
-        .tab-bar a:hover {
-            background-color: #ccc;
-        }
-
-        .tab-bar .myorders-button {
-            background-color: #ffcc00;
-            color: white;
-            font-weight: bold;
-        }
-
-        .nickname-block {
-            color: white;
-            font-weight: bold;
-            background-color: #444;
-            padding: 5px 10px;
-            border-radius: 5px;
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 12px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <link rel="stylesheet" href="../../basic_style.css">
 </head>
 <body>
 
@@ -201,17 +66,18 @@ $conn->close();
 
     <nav>
         <a href="../../restaurants/restaurants.html" class="restaurants-button">Restaurants</a>
-        <a href="../orders.html" class="orders-button">Orders</a>
+        <a href="../orders.html" class="current-button">Orders</a>
         <a href="../../signin/logout.php" class="logout-button">Logout</a>
     </nav>
 
     <div class="tab-bar">
         <a href="../orders.html" class="neworder-button">Create New Order</a>
-        <a href="myorders.php" class="myorders-button">My Orders</a>
+        <a href="myorders.php" class="cur-button">My Orders</a>
     </div>
     
     <main>
-        <h2>My Orders</h2>
+        <h2 class="my-orders-title">My Orders</h2>
+
 
         <?php
         if (count($orders) > 0):

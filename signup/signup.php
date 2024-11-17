@@ -29,30 +29,35 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// 핸드폰 번호 중복 확인 쿼리
-$checkSql = "SELECT * FROM memtbl WHERE phone = '$phone'";
-$result = $conn->query($checkSql);
+$sql_check = "SELECT phone FROM memtbl WHERE phone = '$phone'";
+$result = $conn->query($sql_check);
 
 if ($result->num_rows > 0) {
-    // 중복된 경우 메시지 전달
-    $error = "이미 가입된 전화번호입니다. 다른 번호를 입력해주세요.";
-    header("Location: signup_form.php?error=" . urlencode($error));
-    $conn->close();
+    // 중복 전화번호 에러 메시지와 기존 데이터 전달
+    $error = "이미 있는 전화번호입니다.";
+    $query_data = http_build_query([
+        'phone_error' => $error,
+        'name' => $name,
+        'nickname' => $nickname,
+        'account' => $account,
+        'address1' => $address1,
+        'address2' => $address2,
+        'address3' => $address3,
+        'phone' => $phone,
+    ]);
+    header("Location: signup_form.php?$query_data");
     exit;
 }
 
-// SQL 쿼리 준비 및 실행
-$sql = "INSERT INTO memtbl (name, nickname, account, address1, address2, address3, phone) VALUES ('$name', '$nickname', '$account', '$address1', '$address2', '$address3', '$phone')";
+// 데이터 삽입
+$sql_insert = "INSERT INTO memtbl (name, nickname, account, address1, address2, address3, phone) VALUES ('$name', '$nickname', '$account', '$address1', '$address2', '$address3', '$phone')";
 
-if ($conn->query($sql) === TRUE) {
-    // 회원가입 성공 후 index.php로 리디렉션
+if ($conn->query($sql_insert) === TRUE) {
     header("Location: ../index.php");
     exit;
 } else {
-    $error = "에러: " . $conn->error;
-    header("Location: signup_form.php?error=" . urlencode($error));
+    echo "에러: " . $conn->error;
 }
 
-// 연결 종료
 $conn->close();
 ?>
