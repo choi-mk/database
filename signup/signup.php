@@ -10,11 +10,12 @@ $phone = $_POST['phone'];
 
 // 데이터 유효성 검사 (예: 비어있는 필드가 없는지 확인)
 if (empty($name) || empty($nickname) || empty($account) || empty($address1) || empty($address2) || empty($address3) || empty($phone)) {
-    echo "모든 필드를 입력해주세요.";
+    $error = "모든 필드를 입력해주세요.";
+    header("Location: signup_form.php?error=" . urlencode($error));
     exit;
 }
 
-// 예시: MySQL 데이터베이스에 데이터 저장 (DB 연결 코드 추가 필요)
+// DB 연결 정보
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
 $username = "admin";
 $password = "00000000";
@@ -28,16 +29,28 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// SQL 쿼리 준비
+// 핸드폰 번호 중복 확인 쿼리
+$checkSql = "SELECT * FROM memtbl WHERE phone = '$phone'";
+$result = $conn->query($checkSql);
+
+if ($result->num_rows > 0) {
+    // 중복된 경우 메시지 전달
+    $error = "이미 가입된 전화번호입니다. 다른 번호를 입력해주세요.";
+    header("Location: signup_form.php?error=" . urlencode($error));
+    $conn->close();
+    exit;
+}
+
+// SQL 쿼리 준비 및 실행
 $sql = "INSERT INTO memtbl (name, nickname, account, address1, address2, address3, phone) VALUES ('$name', '$nickname', '$account', '$address1', '$address2', '$address3', '$phone')";
 
-// 쿼리 실행
 if ($conn->query($sql) === TRUE) {
     // 회원가입 성공 후 index.php로 리디렉션
-    header("Location: index.php");
-    exit;  // 리디렉션 후 더 이상 코드를 실행하지 않도록 exit 추가
+    header("Location: ../index.php");
+    exit;
 } else {
-    echo "에러: " . $sql . "<br>" . $conn->error;
+    $error = "에러: " . $conn->error;
+    header("Location: signup_form.php?error=" . urlencode($error));
 }
 
 // 연결 종료

@@ -49,12 +49,25 @@
         .form-group input[type="submit"]:hover {
             background-color: #555;
         }
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="signup-form">
     <h2>Sign Up</h2>
+    
+    <!-- 에러 메시지 출력 -->
+    <?php if (isset($_GET['error'])): ?>
+        <div class="error-message">
+            <?= htmlspecialchars($_GET['error']) ?>
+        </div>
+    <?php endif; ?>
+
     <form action="signup.php" method="post">
         <div class="form-group">
             <label for="name">Name</label>
@@ -82,7 +95,7 @@
         </div>
         <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" pattern="\d+" title="숫자만 입력 가능합니다"required>
+            <input type="tel" id="phone" name="phone" pattern="\d+" title="숫자만 입력 가능합니다" required>
         </div>
         <div class="form-group">
             <input type="submit" value="Sign Up">
