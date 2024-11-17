@@ -2,6 +2,16 @@
 
 session_start();
 
+if (isset($_SESSION['success'])) {
+    echo "<p style='color: green;'>" . htmlspecialchars($_SESSION['success']) . "</p>";
+    unset($_SESSION['success']);  // 메시지를 한 번만 표시
+}
+
+if (isset($_SESSION['error'])) {
+    echo "<p style='color: red;'>" . htmlspecialchars($_SESSION['error']) . "</p>";
+    unset($_SESSION['error']);
+}
+
 // 데이터베이스 연결
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
 $username = "admin";
@@ -53,6 +63,21 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // PHP에서 전달된 메시지를 JavaScript에서 팝업으로 표시
+            const successMessage = "<?= $success_message ?>";
+            const errorMessage = "<?= $error_message ?>";
+
+            if (successMessage) {
+                alert(successMessage);
+            }
+
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+        });
+    </script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <style>
         body {
