@@ -1,10 +1,11 @@
 <?php
 session_start();
 
-// 세션에 사용자가 없다면 로그인 페이지로 리다이렉트
+
 if (!isset($_SESSION['phone'])) {
-    header("Location: login.php");
-    exit();
+    // 로그인되지 않은 경우 리디렉션 정보 반환
+    echo json_encode(["redirect" => "../signin/signin.html"]);
+    exit;
 }
 
 // 사용자 ID 가져오기

@@ -33,7 +33,9 @@ $sql = "INSERT INTO memtbl (name, nickname, account, address1, address2, address
 
 // 쿼리 실행
 if ($conn->query($sql) === TRUE) {
-    echo "회원가입이 완료되었습니다!";
+    // 회원가입 성공 후 index.php로 리디렉션
+    header("Location: index.php");
+    exit;  // 리디렉션 후 더 이상 코드를 실행하지 않도록 exit 추가
 } else {
     echo "에러: " . $sql . "<br>" . $conn->error;
 }
