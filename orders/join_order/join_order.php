@@ -46,30 +46,50 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Order</title>
     <script>
-        function loadMenu() {
-            const restId = document.getElementById('restaurant').value;
-            const menuSelect = document.getElementById('menu');
-            menuSelect.innerHTML = '<option value="">메뉴 로드 중...</option>';
+        document.addEventListener("DOMContentLoaded", function () {
+            // 페이지가 로드되면 메뉴를 자동으로 로드
+            loadMenu();
+        });
+        let selectedCurId = <?= htmlspecialchars($selected_cur_id ?? '0') ?>;
+        let menuPrices = {};
 
+        function loadMenu() {
+            const restId = "<?= $selected_rest_id ?>"; 
+            const menuContainer = document.getElementById('menu-container');
+            menuContainer.innerHTML = '';
+        
             if (restId) {
                 fetch(`menu_loader.php?rest_id=${restId}`)
                     .then(response => response.json())
                     .then(data => {
-                        menuSelect.innerHTML = '<option value="">메뉴를 선택하세요</option>';
                         data.forEach(menu => {
-                            const option = document.createElement('option');
-                            option.value = menu.menu_id;
-                            option.textContent = menu.food;
-                            menuSelect.appendChild(option);
+                            menuPrices[menu.menu_id] = menu.price;
+                        
+                            const menuItem = document.createElement('div');
+                            menuItem.className = 'menu-item';
+                            menuItem.innerHTML = `
+                                <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
+                                <input type="number" id="amount-${menu.menu_id}" name="amount[${menu.menu_id}]" value="0" min="0" oninput="updateTotalPrice()">
+                            `;
+                            menuContainer.appendChild(menuItem);
                         });
                     })
                     .catch(error => {
                         console.error('Error loading menu:', error);
-                        menuSelect.innerHTML = '<option value="">메뉴를 불러오는 데 실패했습니다</option>';
+                        menuContainer.innerHTML = `<p>메뉴를 불러오는 데 실패했습니다. 에러 메시지: ${error.message}</p>`;
                     });
             } else {
-                menuSelect.innerHTML = '<option value="">먼저 식당을 선택하세요</option>';
+                menuContainer.innerHTML = '<p>식당 ID가 없습니다.</p>';
             }
+        }
+
+        function updateTotalPrice() {
+            let totalPrice = selectedCurId;
+            for (const menuId in menuPrices) {
+                const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
+                totalPrice += menuPrices[menuId] * amount;
+            }
+            document.getElementById('total-price').innerHTML = `총 가격: ${totalPrice.toLocaleString()} 원`;
         }
     </script>
     <style>
@@ -132,6 +152,27 @@ $conn->close();
             margin-bottom: 15px;
             text-align: center;
         }
+
+        .menu-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            padding-left: 20px;
+        }
+
+        .menu-item label { 
+            flex: 1; 
+            margin-right: 10px; 
+        }
+
+        .menu-item input { 
+            width: 60px; /* 수량 입력 칸의 너비 */ 
+            text-align: right; 
+            padding: 6px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }   
     </style>
 </head>
 <body>
@@ -143,7 +184,7 @@ $conn->close();
         <div class="input-group">
             <label for="restaurant">주문할 식당</label>
             <?php if ($selected_rest_id): ?>
-                <p id="restaurant"><?= htmlspecialchars($restaurants[0]['name']) ?></p>
+                <p id="restaurant"><?= htmlspecialchars($restaurants[$selected_rest_id-1]['name']) ?></p>
             <?php endif; ?>
         </div>
 
@@ -151,29 +192,16 @@ $conn->close();
         <!-- 메뉴 선택 -->
         <div class="input-group">
             <label for="menu">주문할 메뉴</label>
-            <select id="menu" name="menu" required>
-                <option value="">메뉴를 선택하세요</option>
-            </select>
+            <div id="menu-container">
+            </div>
         </div>
-
-        <!-- 주문 마감 시간 -->
+        
+        <!-- 현재 금액 -->
         <div class="input-group">
-            <label for="time">주문 마감 시간</label>
-            <input type="datetime-local" id="time" name="time" required>
-        </div>
-
-        <!-- 목표 금액 -->
-        <div class="input-group">
-            <label for="goal_money">목표 금액</label>
-            <p id="goal_money"><?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?></p>
-
-        </div>
-
-
-        <!-- 수량 -->
-        <div class="input-group">
-            <label for="amount">현재 금액</label>
-            <input type="number" id="amount" name="amount" required>
+            <div id="total-price" style="margin-top: 10px;">
+                현재 금액: <?= htmlspecialchars($selected_cur_id ?? '0') ?>원
+                (목표 금액 <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>)
+            </div>
         </div>
 
         <!-- 제출 버튼 -->
