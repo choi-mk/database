@@ -9,22 +9,22 @@
 
 :root {
     --title-color: #b5cbed; 
-    --title-text-color: #383737; 
+    --title-text-color: #4f4c4c; 
     --subtitle-color:#86b7f0;
     --subtitle-text-color:#ffffff;
-    --clicksubtitle-text-color:#1500ff;
-    --cursubtitle-text-color:#599cb4;
-    --order-color:#2ba46b;
-    --order-text-color:#02082c;
-    --clickorder-text-color:#cd951c;
-    --curorder-text-color:#6ff5b4;
+    --clicksubtitle-text-color:#827adb;
+    --cursubtitle-text-color:#4328ba;
+    --order-color:#3c6d84;
+    --order-text-color:#ffffff;
+    --clickorder-text-color:#bfaffa;
+    --curorder-text-color:#7dc4e5;
 
 
 
 }
 
 body {
-    font-family: 'DM Sans', Arial, sans-serif;
+    font-family: 'Exo 2', sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--background-color); /* 배경색 */
@@ -64,7 +64,7 @@ nav a {
     color: var(--subtitle-text-color);
     text-decoration: none;
     margin: 0 15px;
-    font-family: 'DM Sans', Arial, sans-serif;
+    font-family: 'Exo 2', sans-serif;
     font-size: 20px;
     font-weight: normal;
     padding: 5px 10px;
@@ -77,9 +77,14 @@ nav a:hover {
     color: var(--clicksubtitle-text-color);
 }
 
+.content {
+    padding-left: 20px; /* 내부 여백 */
+    /* margin-left: 20px; */ /* 외부 여백 (필요시 사용) */
+}
+
 .nickname-block {
     color: white;
-    font-weight: bold;
+    font-weight: normal;
     background-color: #444;
     padding: 5px 10px;
     border-radius: 5px;
@@ -90,7 +95,7 @@ nav a:hover {
 }
 
 .current-button {
-    font-weight: bold;
+    font-weight: normal;
     color:var(--cursubtitle-text-color); /* Secondary 색상 */
 }
 
@@ -108,7 +113,7 @@ main {
     display: flex;
     justify-content: center;
     background-color: var(--order-color); /* 밝은 회색 */
-    padding: 10px;
+    padding: 5px;
     border-bottom: 1px solid #ccc;
 }
 
@@ -116,12 +121,12 @@ main {
     color: var(--order-text-color); /* 어두운 네이비 */
     padding: 10px 20px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: normal;
     margin: 0 5px;
     border-radius: 5px;
     background-color: var(--order-color); /* 배경색: 라이트 그레이 */
     transition: background-color 0.3s, color 0.3s;
-    font-family: 'DM Sans', Arial, sans-serif;
+    font-family: 'Exo 2', sans-serif;
 }
 
 .tab-bar a:hover {
@@ -132,37 +137,16 @@ main {
 .tab-bar .cur-button {
     background-color: var(--order-color); /* Secondary 색상 */
     color: var(--curorder-text-color);
-    font-weight: bold;
+    font-weight: normal;
 }
 
-.my-orders-title {
-    font-size: 28px; /* 제목 크기 조정 */
-    color: var(--primary-color); /* Primary 색상 */
-    text-align: center; /* 가운데 정렬 */
-    margin-bottom: 20px; /* 제목과 내용 간 간격 */
-    border-bottom: 2px solid var(--secondary-color); /* 밑줄 추가 */
-    padding-bottom: 10px; /* 밑줄과의 간격 */
-}
 
-.floating-button {
-    position: fixed;
-    bottom: 20px; /* 페이지 하단에서 20px 위에 위치 */
-    right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
-    width: 60px;
-    height: 60px;
-    background-color: #007BFF; /* 버튼 배경색 (파란색) */
-    color: white;
-    font-size: 36px;
+
+
+h2 {
     text-align: center;
-    line-height: 60px;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.floating-button:hover {
-    background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+    font-size: 28px;
+    font-weight: normal;
 }
 
 
@@ -187,11 +171,26 @@ th, td {
 th {
     background-color: #F9F9F9;
     color: #333;
-    font-weight: bold;
+    font-weight: normal;
 }
-
-
-h2 {
+.floating-button {
+    position: fixed;
+    bottom: 20px; /* 페이지 하단에서 20px 위에 위치 */
+    right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
+    width: 60px;
+    height: 60px;
+    background-color: #007BFF; /* 버튼 배경색 (파란색) */
+    color: white;
+    font-size: 36px;
     text-align: center;
-    font-size: 28px;
+    line-height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
 }
+
+.floating-button:hover {
+    background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+}
+

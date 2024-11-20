@@ -19,11 +19,11 @@ if ($conn->connect_error) {
 $phone = $_SESSION['phone'];
 
 // 준비된 쿼리 사용
-$sql = "SELECT j.order_id, m.food, m.price, r.name, o.current_money, j.amount
+$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state 
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
-        JOIN ordertbl o ON j.order_id = o.order_id
+        JOIN ordertbl o ON o.order_id = j.order_id
         WHERE j.mem_id = ?
         ORDER BY j.order_id";   // mem_id가 1인 주문만 찾음
 
@@ -56,6 +56,29 @@ $conn->close();
     <title>My Orders</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <link rel="stylesheet" href="../../basic_style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .order-block {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
@@ -79,38 +102,49 @@ $conn->close();
     <main>
         <h2 class="my-orders-title">My Orders</h2>
 
+        <?php if (count($orders) > 0): ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Restaurant</th>
+                        <th>Food</th>
+                        <th>Price</th>
+                        <th>Delivery Fee</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $current_order_id = null;
+                    foreach ($orders as $order):
+                        // 새로운 order_id를 만날 때마다 새로운 행을 시작
+                        if ($order['order_id'] != $current_order_id):
+                            if ($current_order_id !== null): ?>
+                                </tr> <!-- 이전 주문 닫기 -->
+                            <?php endif; ?>
+                            <tr>
 
-        <?php
-        if (count($orders) > 0):
-            $current_order_id = null;
-            foreach ($orders as $order):
-                // 새로운 order_id를 만날 때마다 새로운 블록을 시작
-                if ($order['order_id'] != $current_order_id): ?>
-                    <?php if ($current_order_id !== null): ?>
-                        </div> <!-- 이전 블록 닫기 -->
-                    <?php endif; ?>
-                    <div class="order-block">
-                        <h3>Restaurant: <?php echo htmlspecialchars($order['name']); ?></h3>
-                    <?php $current_order_id = $order['order_id']; ?>
-                <?php endif; ?>
-                
-                <div class="order-item">
-                    <strong>Food:</strong> <?php echo htmlspecialchars($order['food']);?>&nbsp;
-                    <?php echo htmlspecialchars($order['amount']); ?>개 <br>
-                    <strong>Price:</strong> <?php echo htmlspecialchars($order['price']*$order['amount']); ?> 원<br><br>                    
-                </div>
+                            <?php $current_order_id = $order['order_id']; ?>
+                        <?php endif; ?>
 
-                <strong>order's current price:</strong> <?php echo htmlspecialchars($order['current_money']); ?> 원
+                        <tr>
+                            <td><?php echo htmlspecialchars($order['order_id']); ?></td>
+                            <td><?php echo htmlspecialchars($order['name']); ?></td>
+                            <td><?php echo htmlspecialchars($order['food']); ?></td>
+                            <td><?php echo htmlspecialchars($order['price']); ?> 원</td>
+                            <td></td>
+                            <td><?php echo htmlspecialchars($order['state']); ?></td>
+                        </tr>
 
-            <?php endforeach; ?>
-            </div> <!-- 마지막 블록 닫기 -->
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         <?php else: ?>
             <p>No orders found.</p>
         <?php endif; ?>
     
     </main>
-
-
 
 </body>
 </html>

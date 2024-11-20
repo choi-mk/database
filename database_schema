@@ -48,6 +48,7 @@ create table paytbl(
 create table jointbl(
    mem_id char(11), foreign key (mem_id) references memtbl(phone),
     order_id int, foreign key (order_id) references ordertbl(order_id),
-    menu int, foreign key (menu) references menutbl(menu_id)
+    menu int, foreign key (menu) references menutbl(menu_id),
+    amount int
 );
 
