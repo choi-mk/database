@@ -19,10 +19,18 @@ if ($conn->connect_error) {
 $phone = $_SESSION['phone'];
 
 // 준비된 쿼리 사용
+<<<<<<< HEAD
 $sql = "SELECT j.order_id, m.food, m.price, r.name
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
+=======
+$sql = "SELECT j.order_id, m.food, m.price, r.name, o.current_money, j.amount
+        FROM jointbl j
+        JOIN menutbl m ON j.menu = m.menu_id
+        JOIN restbl r ON m.rest_id = r.rest_id
+        JOIN ordertbl o ON j.order_id = o.order_id
+>>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
         WHERE j.mem_id = ?
         ORDER BY j.order_id";   // mem_id가 1인 주문만 찾음
 
@@ -94,10 +102,20 @@ $conn->close();
                 <?php endif; ?>
                 
                 <div class="order-item">
+<<<<<<< HEAD
                     <strong>Food:</strong> <?php echo htmlspecialchars($order['food']); ?><br>
                     <strong>Price:</strong> <?php echo htmlspecialchars($order['price']); ?> 원
                 </div>
 
+=======
+                    <strong>Food:</strong> <?php echo htmlspecialchars($order['food']);?>&nbsp;
+                    <?php echo htmlspecialchars($order['amount']); ?>개 <br>
+                    <strong>Price:</strong> <?php echo htmlspecialchars($order['price']*$order['amount']); ?> 원<br><br>                    
+                </div>
+
+                <strong>order's current price:</strong> <?php echo htmlspecialchars($order['current_money']); ?> 원
+
+>>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
             <?php endforeach; ?>
             </div> <!-- 마지막 블록 닫기 -->
         <?php else: ?>
