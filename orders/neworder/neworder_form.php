@@ -45,83 +45,130 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Order</title>
     <script>
+        let menuPrices = {};
+
         function loadMenu() {
             const restId = document.getElementById('restaurant').value;
-            const menuSelect = document.getElementById('menu');
-            menuSelect.innerHTML = '<option value="">메뉴 로드 중...</option>';
+            const menuContainer = document.getElementById('menu-container');
+            menuContainer.innerHTML = '';
 
             if (restId) {
                 fetch(`menu_loader.php?rest_id=${restId}`)
                     .then(response => response.json())
                     .then(data => {
-                        menuSelect.innerHTML = '<option value="">메뉴를 선택하세요</option>';
+                        menuContainer.innerHTML = '<strong>메뉴</strong>';
                         data.forEach(menu => {
-                            const option = document.createElement('option');
-                            option.value = menu.menu_id;
-                            option.textContent = menu.food;
-                            menuSelect.appendChild(option);
+                            menuPrices[menu.menu_id] = menu.price;
+                        
+                            const menuItem = document.createElement('div');
+                            menuItem.className = 'menu-item';
+                            menuItem.innerHTML = `
+                                <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
+                                <input type="number" id="amount-${menu.menu_id}" name="amount[${menu.menu_id}]" value="0" min="0" oninput="updateTotalPrice()">
+                            `;
+                            menuContainer.appendChild(menuItem);
                         });
                     })
                     .catch(error => {
                         console.error('Error loading menu:', error);
-                        menuSelect.innerHTML = '<option value="">메뉴를 불러오는 데 실패했습니다</option>';
+                        menuContainer.innerHTML = `<p>메뉴를 불러오는 데 실패했습니다. 에러 메시지: ${error.message}</p>`;
                     });
             } else {
-                menuSelect.innerHTML = '<option value="">먼저 식당을 선택하세요</option>';
+                menuContainer.innerHTML = '<p>먼저 식당을 선택하세요.</p>';
             }
+        }
+
+        function updateTotalPrice() {
+            let totalPrice = 0;
+            for (const menuId in menuPrices) {
+                const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
+                totalPrice += menuPrices[menuId] * amount;
+            }
+            document.getElementById('total-price').innerHTML = `총 가격: ${totalPrice.toLocaleString()} 원`;
         }
     </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background-color: #f4f4f4; 
         }
-        .signup-form {
-            width: 300px;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+
+        .signup-form { 
+            width: 300px; 
+            padding: 20px; 
+            background-color: #fff; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
         }
-        .signup-form h2 {
-            text-align: center;
-            margin-bottom: 20px;
+
+        .signup-form h2 { 
+            text-align: center; 
+            margin-bottom: 20px; 
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        .form-group { 
+            margin-bottom: 15px; 
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
         }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        .form-group input, 
+        .form-group select { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
         }
-        .form-group input[type="submit"] {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
+
+        .form-group input[type="submit"] { 
+            background-color: #333; 
+            color: #fff; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
         }
-        .form-group input[type="submit"]:hover {
-            background-color: #555;
+
+        .form-group input[type="submit"]:hover { 
+            background-color: #555; 
         }
-        .error-message {
-            color: red;
-            margin-bottom: 15px;
-            text-align: center;
+
+        .error-message { 
+            color: red; 
+            margin-bottom: 15px; 
+            text-align: center; 
+        }
+
+        .menu-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            padding-left: 20px;
+        }
+
+        .menu-item label { 
+            flex: 1; 
+            margin-right: 10px; 
+        }
+
+        .menu-item input { 
+            width: 60px; /* 수량 입력 칸의 너비 */ 
+            text-align: right; 
+            padding: 6px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
         }
     </style>
+
 </head>
 <body>
 <div class="neworder-form">
@@ -129,7 +176,7 @@ $conn->close();
 
     <form action="neworder.php" method="post">
         <div class="form-group">
-            <label for="restaurant">주문할 식당</label>
+            <label for="restaurant"><h3>주문할 식당</h3></label>
             <select id="restaurant" name="restaurant" required onchange="loadMenu()">
                 <option value="">식당을 선택하세요</option>
                 <?php foreach ($restaurants as $restaurant): ?>
@@ -140,28 +187,18 @@ $conn->close();
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="menu">주문할 메뉴</label>
-            <select id="menu" name="menu" required>
-                <option value="">먼저 식당을 선택하세요</option>
-            </select>
-        </div>
+        <div id="menu-container"></div>
+
+        <div id="total-price" style="margin-top: 10px; font-weight: bold;">총 가격: 0 원</div>
 
         <div class="form-group">
-            <label for="time">주문 마감 시간</label>
+            <label for="time"><br>주문 마감 시간</label>
             <input type="datetime-local" id="time" name="time" required>
         </div>
-
         <div class="form-group">
             <label for="goal_money">목표 금액</label>
             <input type="number" id="goal_money" name="goal_money" required>
         </div>
-
-        <div class="form-group">
-            <label for="amount">수량</label>
-            <input type="number" id="amount" name="amount" required>
-        </div>
-
         <div class="form-group">
             <input type="submit" value="New Order">
         </div>
