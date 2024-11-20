@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 create database moju;
 use moju;
 create table memtbl
@@ -52,58 +51,3 @@ create table jointbl(
     menu int, foreign key (menu) references menutbl(menu_id)
 );
 
-=======
-create database moju;
-use moju;
-create table memtbl
-(
-   phone char(11) primary key,
-    address1 varchar(30),
-    address2 varchar(30),
-    address3 varchar(30),
-    nickname varchar(10),
-    account varchar(20),
-    name varchar(10)
-);
-create table restbl(
-   rest_id int primary key,
-    address varchar(30),
-    delivery_expense int,
-    name varchar(20)    
-);
-create table ordertbl
-(
-   order_id int primary key,
-    time datetime,
-    state ENUM('active', 'inactive', 'pending', 'cooking', 'delivering', 'complete') NOT NULL,
-    current_money int,
-    goal_money int,
-    participants_num int, 
-    check(participants_num<10),
-    cur_deliver int,
-    leader char(11), foreign key (leader) references memtbl(phone),
-    restaurant int, foreign key (restaurant) references restbl(rest_id)    
-);
-
-create table menutbl(
-   menu_id int primary key,
-   rest_id int, foreign key (rest_id) references restbl(rest_id),
-    food varchar(20),
-    price int
-);
-
-create table paytbl(
-   mem_id char(11), foreign key (mem_id) references memtbl(phone),
-    order_id int, foreign key (order_id) references ordertbl(order_id),
-    PRIMARY KEY (mem_id, order_id),
-    final_payment int,
-    refund int,
-    initial_payment int
-);
-create table jointbl(
-   mem_id char(11), foreign key (mem_id) references memtbl(phone),
-    order_id int, foreign key (order_id) references ordertbl(order_id),
-    menu int, foreign key (menu) references menutbl(menu_id)
-);
-
->>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5

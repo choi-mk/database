@@ -9,20 +9,12 @@
 
 :root {
     --title-color: #b5cbed; 
-<<<<<<< HEAD
     --title-text-color: #383737; 
-=======
-    --title-text-color: #000000; 
->>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
     --subtitle-color:#86b7f0;
     --subtitle-text-color:#ffffff;
     --clicksubtitle-text-color:#1500ff;
     --cursubtitle-text-color:#599cb4;
-<<<<<<< HEAD
     --order-color:#2ba46b;
-=======
-    --order-color:#6f81f5;
->>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
     --order-text-color:#02082c;
     --clickorder-text-color:#cd951c;
     --curorder-text-color:#6ff5b4;
@@ -72,11 +64,7 @@ nav a {
     color: var(--subtitle-text-color);
     text-decoration: none;
     margin: 0 15px;
-<<<<<<< HEAD
     font-family: 'DM Sans', Arial, sans-serif;
-=======
-    font-family: 'Sour Gummy', Arial, sans-serif;
->>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
     font-size: 20px;
     font-weight: normal;
     padding: 5px 10px;
@@ -156,7 +144,26 @@ main {
     padding-bottom: 10px; /* 밑줄과의 간격 */
 }
 
+.floating-button {
+    position: fixed;
+    bottom: 20px; /* 페이지 하단에서 20px 위에 위치 */
+    right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
+    width: 60px;
+    height: 60px;
+    background-color: #007BFF; /* 버튼 배경색 (파란색) */
+    color: white;
+    font-size: 36px;
+    text-align: center;
+    line-height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
 
+.floating-button:hover {
+    background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+}
 
 
 
@@ -181,4 +188,10 @@ th {
     background-color: #F9F9F9;
     color: #333;
     font-weight: bold;
+}
+
+
+h2 {
+    text-align: center;
+    font-size: 28px;
 }

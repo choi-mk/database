@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,17 +22,34 @@
     </nav>
 
     <div class="tab-bar">
-        <a href="neworder/neworder_form.php" class="neworder-button">Create New Order</a>
+        <a href="orders.html" class="neworder-button">Current Order</a>
         <a href="myorders/myorders.php" class="myorders-button">My Orders</a>
     </div>
     
     <div class="orders-form">
-        <h2>Current Orders</h2>
+        <main>
+            <h2>Current Orders</h2>
+        
         <div id="active-order-list">
-            <!-- 레스토랑 목록이 여기에 추가됩니다 -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Close</th>
+                        <th>Goal Money</th>
+                        <th>Current Money</th>
+                        <th>Restaurant</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="order-rows">
+                    <!-- 주문 목록이 여기에 추가됩니다 -->
+                </tbody>
+            </table>
         </div>
-    </div>
-    
+        </div>
+        </main>
+<a href="neworder/neworder_form.php" class="floating-button">+</a>
     <script>
        document.addEventListener("DOMContentLoaded", function () {
     fetch('orders.php')
@@ -45,119 +61,58 @@
                 return;
             }
 
-            const orderList = document.getElementById('active-order-list');
+            const orderRows = document.getElementById('order-rows');
 
             if (data.message) {
-                orderList.innerHTML = `<p>${data.message}</p>`;
+                orderRows.innerHTML = `<tr><td colspan="6">${data.message}</td></tr>`;
             } else {
                 data.forEach(order => {
-                    const div = document.createElement('div');
-                    div.className = 'order-item';
-                    div.innerHTML = `
-                        <p><strong>Order ID:</strong> ${order.order_id}</p>
-                        <p><strong>Order Close:</strong> ${order.time}</p>
-                        <p><strong>Goal Money:</strong> ${order.goal_money}</p>
-                        <p><strong>Current Money:</strong> ${order.current_money}</p>
-                        <p><strong>Restaurant:</strong> ${order.name}</p>
-                        <button class="join-button" data-id="${order.order_id}" data-rest-id="${order.restaurant}" data-goal-id="${order.goal_money}" data-cur-id="${order.current_money}">Join</button>
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.order_id}</td>
+                        <td>${order.time}</td>
+                        <td>${order.goal_money}</td>
+                        <td>${order.current_money}</td>
+                        <td>${order.name}</td>
+                        <td>
+                            <button class="join-button" 
+                                data-id="${order.order_id}" 
+                                data-rest-id="${order.restaurant}" 
+                                data-goal-id="${order.goal_money}" 
+                                data-cur-id="${order.current_money}" 
+                                data-time-id="${order.time}">
+                                Join
+                            </button>
+                        </td>
                     `;
-                    orderList.appendChild(div);
+                    orderRows.appendChild(row);
                 });
 
                 // Join 버튼 클릭 이벤트 추가
                 const joinButtons = document.querySelectorAll(".join-button");
-            joinButtons.forEach(button => {
-            button.addEventListener("click", function () {
-            const orderId = this.dataset.id; // 현재 주문 ID
-            const restId = this.dataset.restId; // 현재 식당 ID
-            const goalId = this.dataset.goalId; 
-            const curId = this.dataset.curId; 
-            // URL에 식당 ID와 주문 ID 포함
-            window.location.href = `join_order/join_order.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}`;
-        });
-    });
+                joinButtons.forEach(button => {
+                    button.addEventListener("click", function () {
+                        const orderId = this.dataset.id;
+                        const restId = this.dataset.restId;
+                        const goalId = this.dataset.goalId;
+                        const curId = this.dataset.curId;
+                        const timeId = this.dataset.timeId;
+
+                        // URL에 식당 ID와 주문 ID 포함
+                        window.location.href = `join_order/join_order.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
+                    });
+                });
             }
         })
         .catch(error => {
             console.error('Error fetching orders:', error);
-            document.getElementById('active-order-list').innerHTML = '<p>Error loading data.</p>';
+            document.getElementById('order-rows').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
         });
 });
 
 
+
     </script>
 
 </body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders</title>
-    <link rel = "stylesheet" href = "https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
-    <link rel="stylesheet" href="../basic_style.css">
-</head>
-<body>
-
-    <header>
-        <a href="../index.php" class="header-link">
-            <h1>MoJu</h1>
-        </a>
-    </header>
-
-    <nav>
-        <a href="../restaurants/restaurants.html" class="restaurants-button">Restaurants</a>
-        <a href="orders.html" class="current-button">Orders</a>
-        <a href="../signin/logout.php" class="logout-button">Logout</a>
-    </nav>
-
-    <div class="tab-bar">
-        <a href="neworder/neworder_form.php" class="neworder-button">Create New Order</a>
-        <a href="myorders/myorders.php" class="myorders-button">My Orders</a>
-    </div>
-    
-    <div class="orders-form">
-        <h2>Current Orders</h2>
-        <div id="active-order-list">
-            <!-- 레스토랑 목록이 여기에 추가됩니다 -->
-        </div>
-    </div>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('orders.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.redirect) {
-                        alert("먼저 로그인을 해주세요");
-                        window.location.href = data.redirect;
-                    } else {
-                        const restaurantList = document.getElementById('restaurant-list');
-    
-                        if (data.error) {
-                            restaurantList.innerHTML = `<p>${data.error}</p>`;
-                        } else if (data.message) {
-                            restaurantList.innerHTML = `<p>${data.message}</p>`;
-                        } else {
-                            data.forEach(restaurant => {
-                                const div = document.createElement('div');
-                                div.className = 'restaurant-item';
-                                div.innerHTML = `<strong>${restaurant.name}</strong><br>
-                                                 Address: ${restaurant.address1}, ${restaurant.address2}, ${restaurant.address3}`;
-                                restaurantList.appendChild(div);
-                            });
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching restaurant data:', error);
-                    document.getElementById('restaurant-list').innerHTML = '<p>Error loading data.</p>';
-                });
-        });
-    </script>
-
-</body>
-</html>
->>>>>>> e480ebc436270c6e5db50323884979fb6d70b0e5
