@@ -8,16 +8,17 @@
 
 
 :root {
-    --title-color: #89A8B2; 
-    --title-text-color: #313a38; 
-    --subtitle-color:#B3C8CF;
-    --subtitle-text-color:#566164;
-    --clicksubtitle-text-color:#7bbcd1;
-    --cursubtitle-text-color:#3389a5;
-    --order-color:#e1ded9;
-    --order-text-color:#65615d;
-    --clickorder-text-color:#d7c19a;
-    --curorder-text-color:#ca9b48;
+    --title-color: #9FBED2;
+    --title-text-color: #4b3e3e; 
+    --subtitle-color:    #CBDDE6;
+    --subtitle-text-color:#655d5d;  
+    --clicksubtitle-text-color:#827adb;
+    --cursubtitle-text-color:#274a96;
+    --order-color: #E8EDEE;
+    --order-text-color:#655d5d;
+    --clickorder-text-color:#9283c8;
+    --curorder-text-color:#4399c1;
+
 
 
 
@@ -112,7 +113,7 @@ main {
     display: flex;
     justify-content: center;
     background-color: var(--order-color); /* 밝은 회색 */
-    padding: 2px;
+    padding: 0px;
 }
 
 .tab-bar a {
