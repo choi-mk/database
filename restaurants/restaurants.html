@@ -6,34 +6,8 @@
     <title>Restaurants</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <link rel="stylesheet" href="../basic_style.css">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
 
-        table, th, td {
-            border: 1px solid black;
-        }
 
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .restaurants-form {
-            margin: 20px;
-        }
-
-        .restaurant-item {
-            margin: 20px 0;
-        }
-
-    </style>
 </head>
 <body>
     <header>
@@ -41,61 +15,57 @@
             <h1>MoJu</h1>
         </a>
     </header>
+
     <nav>
         <a href="restaurants.html" class="current-button">Restaurants</a>
         <a href="../orders/orders.html" class="orders-button">Orders</a>
         <a href="../signin/logout.php" class="logout-button">Logout</a>
     </nav>
 
-    <div class="restaurants-form">
-        <h2>Available Restaurants</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Restaurant Name</th>
-                    <th>Address</th>
-                </tr>
-            </thead>
-            <tbody id="restaurant-list">
-                <!-- 레스토랑 목록이 여기에 추가됩니다 -->
-            </tbody>
-        </table>
-    </div>
-    
+    <main>
+        <div class="header-container">
+            <h2>Available Restaurants</h2>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search restaurants...">
+            </div>
+        </div>
+        <div id="restaurant-list" class="list-container">
+            <!-- JavaScript로 레스토랑 목록이 여기에 추가됩니다 -->
+        </div>
+    </main>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch('restaurants.php')
                 .then(response => response.json())
                 .then(data => {
+                    const restaurantList = document.getElementById('restaurant-list');
+
                     if (data.redirect) {
                         alert("먼저 로그인을 해주세요");
                         window.location.href = data.redirect;
+                    } else if (data.error) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
+                    } else if (data.message) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
                     } else {
-                        const restaurantList = document.getElementById('restaurant-list');
-    
-                        if (data.error) {
-                            restaurantList.innerHTML = `<tr><td colspan="2">${data.error}</td></tr>`;
-                        } else if (data.message) {
-                            restaurantList.innerHTML = `<tr><td colspan="2">${data.message}</td></tr>`;
-                        } else {
-                            data.forEach(restaurant => {
-                                const row = document.createElement('tr');
-                                row.innerHTML = `
-                                    <td><strong>${restaurant.name}</strong></td>
-                                    <td>${restaurant.address1} ${restaurant.address2} ${restaurant.address3}</td>
-                                `;
+                        data.forEach(restaurant => {
+                            const box = document.createElement('div');
+                            box.className = 'list-box';
+                            box.innerHTML = `
+                                <div class="list-restaurant">${restaurant.name}</div>
+                                </div>
+                            `;
 
-                                restaurantList.appendChild(row);
-                            });
-                        }
+                            restaurantList.appendChild(box);
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching restaurant data:', error);
-                    document.getElementById('restaurant-list').innerHTML = '<tr><td colspan="2">Error loading data.</td></tr>';
+                    document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
                 });
         });
     </script>
-
 </body>
 </html>

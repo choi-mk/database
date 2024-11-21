@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 // 데이터베이스 연결
@@ -25,23 +24,32 @@ $sql = "SELECT j.order_id, m.food, m.price, r.name, o.state
         JOIN restbl r ON m.rest_id = r.rest_id
         JOIN ordertbl o ON o.order_id = j.order_id
         WHERE j.mem_id = ?
-        ORDER BY j.order_id";   // mem_id가 1인 주문만 찾음
+        ORDER BY 
+            FIELD(o.state, 'cooking', 'active', 'inactive'), 
+            j.order_id ASC";
 
 $stmt = $conn->prepare($sql);
-
-$stmt->bind_param("s",$phone);
-
+$stmt->bind_param("s", $phone);
 $stmt->execute();
 
-// 쿼리 실행
+// 쿼리 실행 및 데이터 가져오기
 $result = $stmt->get_result();
 
-// 결과 저장
-$orders = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $orders[] = $row;
+// 결과 저장 (order_id로 그룹화)
+$orders_grouped = [];
+while ($row = $result->fetch_assoc()) {
+    $order_id = $row['order_id'];
+    if (!isset($orders_grouped[$order_id])) {
+        $orders_grouped[$order_id] = [
+            'order_id' => $order_id,
+            'name' => $row['name'],
+            'foods' => [],
+            'price' => 0,
+            'state' => $row['state']
+        ];
     }
+    $orders_grouped[$order_id]['foods'][] = $row['food'];
+    $orders_grouped[$order_id]['price'] += $row['price'];
 }
 
 // 연결 종료
@@ -56,32 +64,10 @@ $conn->close();
     <title>My Orders</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <link rel="stylesheet" href="../../basic_style.css">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
 
-        table, th, td {
-            border: 1px solid black;
-        }
 
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .order-block {
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
-
     <header>
         <a href="../../index.php" class="header-link">
             <h1>MoJu</h1>
@@ -95,56 +81,37 @@ $conn->close();
     </nav>
 
     <div class="tab-bar">
-        <a href="../orders.html" class="neworder-button">Create New Order</a>
+        <a href="../orders.html" class="neworder-button">Current Order</a>
         <a href="myorders.php" class="cur-button">My Orders</a>
     </div>
     
     <main>
         <h2 class="my-orders-title">My Orders</h2>
 
-        <?php if (count($orders) > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Restaurant</th>
-                        <th>Food</th>
-                        <th>Price</th>
-                        <th>Delivery Fee</th>
-                        <th>State</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $current_order_id = null;
-                    foreach ($orders as $order):
-                        // 새로운 order_id를 만날 때마다 새로운 행을 시작
-                        if ($order['order_id'] != $current_order_id):
-                            if ($current_order_id !== null): ?>
-                                </tr> <!-- 이전 주문 닫기 -->
-                            <?php endif; ?>
-                            <tr>
-
-                            <?php $current_order_id = $order['order_id']; ?>
-                        <?php endif; ?>
-
-                        <tr>
-                            <td><?php echo htmlspecialchars($order['order_id']); ?></td>
-                            <td><?php echo htmlspecialchars($order['name']); ?></td>
-                            <td><?php echo htmlspecialchars($order['food']); ?></td>
-                            <td><?php echo htmlspecialchars($order['price']); ?> 원</td>
-                            <td></td>
-                            <td><?php echo htmlspecialchars($order['state']); ?></td>
-                        </tr>
-
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <?php if (count($orders_grouped) > 0): ?>
+            <div class="list-container">
+                <?php foreach ($orders_grouped as $order): ?>
+                    <div class="list-box">
+                        <div class="order-state <?php 
+                            echo ($order['state'] === 'cooking') ? 'state-cooking' :
+                                 (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
+                            <?php echo htmlspecialchars($order['state']); ?>
+                        </div>
+                        <div class="order-restaurant">
+                            <?php echo htmlspecialchars($order['name']); ?>
+                        </div>
+                        <div class="order-foods">
+                            <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
+                        </div>
+                        <div class="order-price">
+                            <?php echo htmlspecialchars($order['price']); ?> 원
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php else: ?>
             <p>No orders found.</p>
         <?php endif; ?>
-    
     </main>
-
 </body>
 </html>
