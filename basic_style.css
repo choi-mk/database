@@ -21,6 +21,7 @@
 
 
 
+
 }
 
 body {
@@ -168,7 +169,7 @@ th, td {
 }
 
 th {
-    background-color: #F9F9F9;
+    background-color: #cdc7bd;
     color: #333;
     font-weight: normal;
 }
@@ -178,7 +179,7 @@ th {
     right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
     width: 60px;
     height: 60px;
-    background-color: #007BFF; /* 버튼 배경색 (파란색) */
+    background-color: #3389a5; /* 버튼 배경색 (파란색) */
     color: white;
     font-size: 36px;
     text-align: center;
@@ -190,6 +191,5 @@ th {
 }
 
 .floating-button:hover {
-    background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+    background-color: #3389a5; /* 호버 시 버튼 색상 변경 */
 }
-
