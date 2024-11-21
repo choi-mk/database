@@ -8,16 +8,16 @@
 
 
 :root {
-    --title-color: #b5cbed; 
-    --title-text-color: #4f4c4c; 
-    --subtitle-color:#86b7f0;
-    --subtitle-text-color:#ffffff;
-    --clicksubtitle-text-color:#827adb;
-    --cursubtitle-text-color:#4328ba;
-    --order-color:#3c6d84;
-    --order-text-color:#ffffff;
-    --clickorder-text-color:#bfaffa;
-    --curorder-text-color:#7dc4e5;
+    --title-color: #89A8B2; 
+    --title-text-color: #313a38; 
+    --subtitle-color:#B3C8CF;
+    --subtitle-text-color:#566164;
+    --clicksubtitle-text-color:#7bbcd1;
+    --cursubtitle-text-color:#3389a5;
+    --order-color:#e1ded9;
+    --order-text-color:#65615d;
+    --clickorder-text-color:#d7c19a;
+    --curorder-text-color:#ca9b48;
 
 
 
@@ -34,7 +34,7 @@ body {
 header {
     background-color: var(--title-color); /* 헤더 배경색 */
     color: var(--title-text-color);
-    height: 80px; /* 헤더 크기 */
+    height: 90px; /* 헤더 크기 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -67,7 +67,7 @@ nav a {
     font-family: 'Exo 2', sans-serif;
     font-size: 20px;
     font-weight: normal;
-    padding: 5px 10px;
+    padding: 1px 10px;
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -113,13 +113,12 @@ main {
     display: flex;
     justify-content: center;
     background-color: var(--order-color); /* 밝은 회색 */
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+    padding: 2px;
 }
 
 .tab-bar a {
     color: var(--order-text-color); /* 어두운 네이비 */
-    padding: 10px 20px;
+    padding: 7px 15px;
     text-decoration: none;
     font-weight: normal;
     margin: 0 5px;
@@ -169,7 +168,7 @@ th, td {
 }
 
 th {
-    background-color: #F9F9F9;
+    background-color: #cdc7bd;
     color: #333;
     font-weight: normal;
 }
@@ -179,7 +178,7 @@ th {
     right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
     width: 60px;
     height: 60px;
-    background-color: #007BFF; /* 버튼 배경색 (파란색) */
+    background-color: #3389a5; /* 버튼 배경색 (파란색) */
     color: white;
     font-size: 36px;
     text-align: center;
@@ -191,6 +190,5 @@ th {
 }
 
 .floating-button:hover {
-    background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+    background-color: #3389a5; /* 호버 시 버튼 색상 변경 */
 }
-
