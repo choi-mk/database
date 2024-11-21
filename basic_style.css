@@ -8,17 +8,16 @@
 
 
 :root {
-    --title-color: #9FBED2;
-    --title-text-color: #4b3e3e; 
-    --subtitle-color:    #CBDDE6;
-    --subtitle-text-color:#655d5d;  
-    --clicksubtitle-text-color:#827adb;
-    --cursubtitle-text-color:#274a96;
-    --order-color: #E8EDEE;
-    --order-text-color:#655d5d;
-    --clickorder-text-color:#9283c8;
-    --curorder-text-color:#4399c1;
-
+    --title-color: #89A8B2; 
+    --title-text-color: #313a38; 
+    --subtitle-color:#B3C8CF;
+    --subtitle-text-color:#566164;
+    --clicksubtitle-text-color:#7bbcd1;
+    --cursubtitle-text-color:#3389a5;
+    --order-color:#e1ded9;
+    --order-text-color:#65615d;
+    --clickorder-text-color:#d7c19a;
+    --curorder-text-color:#ca9b48;
 
 
 
@@ -113,7 +112,7 @@ main {
     display: flex;
     justify-content: center;
     background-color: var(--order-color); /* 밝은 회색 */
-    padding: 0px;
+    padding: 2px;
 }
 
 .tab-bar a {
@@ -178,7 +177,7 @@ th {
     right: 20px; /* 페이지 우측에서 20px 왼쪽에 위치 */
     width: 60px;
     height: 60px;
-    background-color: var(--subtitle-color); /* 버튼 배경색 (파란색) */
+    background-color: #3389a5; /* 버튼 배경색 (파란색) */
     color: white;
     font-size: 36px;
     text-align: center;
@@ -190,7 +189,7 @@ th {
 }
 
 .floating-button:hover {
-    background-color: var(--title-color); /* 호버 시 버튼 색상 변경 */
+    background-color: #3389a5; /* 호버 시 버튼 색상 변경 */
 }
 .container {
     position: absolute;
@@ -286,7 +285,7 @@ th {
     padding: 15px;
     width: calc(100% - 20px); /* 한 줄에 3개 박스 배치 */
     box-sizing: border-box;
-    background-color: #bbd8e2;
+    background-color: #ccdfe5;
     transition: transform 0.2s;
 }
 
@@ -348,7 +347,7 @@ th {
 .search-bar-container {
     align-self: flex-end; /* 검색창을 오른쪽에 정렬 */
     margin-top: 10px; /* 제목 아래에 간격 추가 */
-
+    right: 10%;
 }
 
 .search-bar {
