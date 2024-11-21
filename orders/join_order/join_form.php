@@ -1,5 +1,6 @@
 <?php
 session_start();
+$order_id =  isset($_GET['order_id']) ? htmlspecialchars($_GET['order_id']) : null;
 $selected_rest_id = isset($_GET['rest_id']) ? htmlspecialchars($_GET['rest_id']) : null;
 $selected_goal_id = isset($_GET['goal_id']) ? htmlspecialchars($_GET['goal_id']) : null;
 $selected_cur_id = isset($_GET['cur_id']) ? htmlspecialchars($_GET['cur_id']) : null;
@@ -22,19 +23,13 @@ $phone = $_SESSION['phone'];
 
 // 식당 목록 가져오기
 $stmt = $conn->prepare(
-    "SELECT r.rest_id, r.name 
-    FROM restbl r
-    JOIN deliverable d ON r.rest_id = d.rest_id
-    WHERE d.phone = ?"
+    "SELECT r.name FROM restbl r WHERE r.rest_id = ?"
 );
-$stmt->bind_param("s", $phone);
+$stmt->bind_param("i", $selected_rest_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
-$restaurants = [];
-while ($row = $result->fetch_assoc()) {
-    $restaurants[] = $row;
-}
+$row = $result->fetch_assoc();
+$restaurant = $row['name'];
 $stmt->close();
 $conn->close();
 ?>
@@ -51,6 +46,7 @@ $conn->close();
             loadMenu();
         });
         let selectedCurId = <?= htmlspecialchars($selected_cur_id ?? '0') ?>;
+        let selectedGoalId = <?= htmlspecialchars($selected_goal_id ?? 'null') ?>;
         let menuPrices = {};
 
         function loadMenu() {
@@ -89,7 +85,23 @@ $conn->close();
                 const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
                 totalPrice += menuPrices[menuId] * amount;
             }
-            document.getElementById('total-price').innerHTML = `총 가격: ${totalPrice.toLocaleString()} 원`;
+            let myPrice = totalPrice-selectedCurId
+            let goalText = selectedGoalId !== null ? `목표 금액: ${selectedGoalId.toLocaleString()} 원` : "목표 금액 없음";
+            document.getElementById('total-price').innerHTML = `
+                지불할 금액: ${myPrice.toLocaleString()} 원 <br>
+                현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
+            `;
+            document.getElementById('my-price').value = myPrice;
+            document.getElementById('total-price-hidden').value = totalPrice;
+        }
+
+        function filterAmountInputs() {
+            const inputs = document.querySelectorAll("input[name^='amount']");
+            inputs.forEach(input => {
+                if (parseInt(input.value) === 0) {
+                    input.remove();
+                }
+            });
         }
     </script>
     <style>
@@ -179,12 +191,13 @@ $conn->close();
 <div class="joinorder-container">
     <h2>Join Order</h2>
 
-    <form action="newjoin.php" method="post">
+    <form action="join.php" method="post" onsubmit="filterAmountInputs()">
         <!-- 식당 선택 및 표시 -->
         <div class="input-group">
             <label for="restaurant">주문할 식당</label>
             <?php if ($selected_rest_id): ?>
-                <p id="restaurant"><?= htmlspecialchars($restaurants[$selected_rest_id-1]['name']) ?></p>
+                <p id="restaurant"><?= htmlspecialchars($restaurant) ?></p>
+                <input type="hidden" name="rest_id" value="<?= htmlspecialchars($selected_rest_id) ?>">
             <?php endif; ?>
         </div>
 
@@ -204,8 +217,12 @@ $conn->close();
             </div>
         </div>
 
+        <input type="hidden" id="total-price-hidden" name="total_price" value="0"> <!-- totalPrice 값 -->
+        <input type="hidden" id="my-price" name="my_price" value="0"> <!-- myPrice 값 -->
+        <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id) ?>"> <!-- order_id 값 -->
+
         <!-- 제출 버튼 -->
-        <div class="input-group">
+        <div class= "input-group" >
             <button type="submit" class="submit-btn">Join Order</button>
         </div>
     </form>
