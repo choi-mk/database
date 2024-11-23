@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
+    <link rel="stylesheet" href="../basic_style.css">
+    <style>
+        main {
+            padding: 20px;
+            background: #f9f9f9;
+            margin: 20px auto;
+            max-width: 1000px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #restaurant-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .list-box {
+            display: flex;
+            align-items: center;
+            flex: 0 1 calc(50% - 20px);
+            box-sizing: border-box;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .list-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .list-restaurant {
+            display: flex;
+            align-items: center;
+        }
+
+        .restaurant-img {
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .restaurant-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #restaurant-list .list-box:last-child {
+            flex: 0 1 calc(50% - 20px);
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../index.php" class="header-link">
+            <h1>MoJu</h1>
+        </a>
+    </header>
+
+    <nav>
+        <a href="restaurants.html" class="current-button">Restaurants</a>
+        <a href="../orders/orders.html" class="orders-button">Orders</a>
+        <a href="../signin/logout.php" class="logout-button">Logout</a>
+    </nav>
+
+    <main>
+        <div class="header-container">
+            <h2>Available Restaurants</h2>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search menu...">
+            </div>
+        </div>
+        <div id="restaurant-list" class="list-container">
+            <!-- JavaScript로 레스토랑 목록이 여기에 추가됩니다 -->
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let restaurantsData = [];
+
+            const restaurantList = document.getElementById("restaurant-list");
+            const searchInput = document.getElementById("search-input");
+
+            function renderRestaurants(data) {
+                restaurantList.innerHTML = "";
+                if (data.length === 0) {
+                    restaurantList.innerHTML = `<div class="error-message">No restaurants found.</div>`;
+                    return;
+                }
+                data.forEach((restaurant) => {
+                    const box = document.createElement("div");
+                    box.className = "list-box";
+
+                    box.innerHTML = `
+                        <div class="list-restaurant">
+                            <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
+                            <span class="restaurant-name">${restaurant.name}</span>
+                        </div>
+                    `;
+
+                    box.addEventListener("click", () => {
+                        window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                    });
+
+                    restaurantList.appendChild(box);
+                });
+            }
+
+            fetch("restaurants.php")
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.redirect) {
+                        alert("먼저 로그인을 해주세요");
+                        window.location.href = data.redirect;
+                    } else if (data.error) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
+                    } else if (data.message) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
+                    } else {
+                        restaurantsData = data;
+                        renderRestaurants(restaurantsData);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching restaurant data:", error);
+                    restaurantList.innerHTML = '<div class="error-message">Error loading data.</div>';
+                });
+
+            searchInput.addEventListener("input", function () {
+                const searchValue = searchInput.value.toLowerCase();
+                const filteredData = restaurantsData.filter((restaurant) =>
+                    restaurant.menu.some((menuItem) => menuItem.toLowerCase().includes(searchValue))
+                );
+                renderRestaurants(filteredData);
+            });
+        });
+    </script>
+</body>
+</html>
