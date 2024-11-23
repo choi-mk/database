@@ -21,7 +21,7 @@ if ($conn->connect_error) {
 $phone = $_SESSION['phone'];
 
 // 준비된 쿼리 사용
-$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state, r.img, o.cur_deliver, o.participants_num
+$sql = "SELECT j.order_id, j.amount, m.food, m.price, r.name, o.state, r.img, o.cur_deliver, o.participants_num
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
@@ -51,12 +51,15 @@ while ($row = $result->fetch_assoc()) {
             'state' => $row['state'], 
             'cur_deliver' => $row['cur_deliver'],
             'img' => $row['img'],
-            'participants_num' => $row['participants_num'] 
+            'participants_num' => $row['participants_num'],
+            'amount' => $row['amount'] 
             
         ];
     }
-    $orders_grouped[$order_id]['foods'][] = $row['food'];
-    $orders_grouped[$order_id]['price'] += $row['price'];
+    if ($row['amount'] > 0) {
+        $orders_grouped[$order_id]['foods'][] = $row['food'];
+        $orders_grouped[$order_id]['price'] += $row['price'] * $row['amount'];
+    }
 }
 
 // 연결 종료
@@ -208,19 +211,24 @@ $conn->close();
                                     <?php echo htmlspecialchars($order['price']); ?> 원
                                 </div>
                                 <div class="delivery-fee"> 
-    <?php 
-        $participants_num = $order['participants_num'];
-        $cur_deliver = $order['cur_deliver'];
+                                    <?php 
+                                        $participants_num = $order['participants_num'];
+                                        $cur_deliver = $order['cur_deliver'];
 
-        // participants_num이 0보다 큰 경우에만 나누기
-        if ($participants_num > 0) {
-            $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
-            echo htmlspecialchars($delivery_fee_per_participant) . " 원";
-        } else {
-            echo "정보 없음";
-        }
-    ?>
-</div>
+                                        // participants_num이 0보다 큰 경우에만 나누기
+                                        if ($participants_num > 0) {
+                                            $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
+                                            echo htmlspecialchars($delivery_fee_per_participant) . " 원";
+                                        } else {
+                                            echo "정보 없음";
+                                        }
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="edit-button-container">
+                                <button class="submit-btn" onclick="window.location.href='../edit_order/edit_order.php?order_id=<?php echo htmlspecialchars($order['order_id']); ?>'">
+                                    Edit
+                                </button>
                             </div>
                         </div>
                     </div>
