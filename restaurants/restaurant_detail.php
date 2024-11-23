@@ -175,12 +175,25 @@ $conn->close();
         </div>
     </main>
 
+    <a href="../orders/neworder/neworder_form.php" class="floating-button" id="new-order-btn" data-rest-id="<?= $rest_id ?>">+</a>
 
     <script>
         const menus = <?= json_encode($menus) ?>;
         const orders = <?= json_encode($orders) ?>;
 
         document.addEventListener("DOMContentLoaded", function () {
+            const floatingButton = document.getElementById("new-order-btn");
+
+            floatingButton.addEventListener("click", function (event) {
+                // Prevent default link behavior
+                event.preventDefault();
+            
+                // Get the rest_id from the data attribute
+                const restId = this.dataset.restId;
+            
+                // Redirect to the new order form with the rest_id as a query parameter
+                window.location.href = `../orders/neworder/neworder_form.php?rest_id=${restId}`;
+            });
             const menuList = document.getElementById('menu-list');
             const searchInput = document.getElementById('search-input');
             const orderList = document.getElementById('order-list');
