@@ -1,5 +1,8 @@
 <?php
-session_start();
+session_start();  // 세션 시작
+
+// 로그인 상태 확인
+$is_logged_in = isset($_SESSION['phone']);  // 세션에 phone이 저장되어 있으면 로그인 상태
 
 // 데이터베이스 연결
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
@@ -154,6 +157,12 @@ $conn->close();
         <a href="../../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
+        <?php if ($is_logged_in): ?>
+            <!-- 로그인 상태일 때 닉네임 표시 -->
+            <div class="nickname-block">
+                <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+            </div>
+        <?php endif; ?>
     </header>
 
     <nav>
