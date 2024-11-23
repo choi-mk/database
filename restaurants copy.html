@@ -31,14 +31,14 @@
         #restaurant-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px; /* 요소 간 간격 */
-            justify-content: flex-start; /* 왼쪽 정렬 */
+            gap: 20px;
+            justify-content: flex-start;
         }
 
         .list-box {
-            display: flex; /* 이미지와 텍스트를 나란히 배치 */
-            align-items: center; /* 세로 정렬 */
-            flex: 0 1 calc(50% - 20px); /* 2단 레이아웃 */
+            display: flex;
+            align-items: center;
+            flex: 0 1 calc(50% - 20px);
             box-sizing: border-box;
             padding: 20px;
             border: 1px solid #ccc;
@@ -55,15 +55,15 @@
 
         .list-restaurant {
             display: flex;
-            align-items: center; /* 텍스트와 이미지가 가운데 정렬 */
+            align-items: center;
         }
 
         .restaurant-img {
-            width: 80px; /* 이미지 크기 설정 */
-            height: 80px; /* 이미지 크기 설정 */
-            margin-right: 15px; /* 텍스트와 간격 */
-            border-radius: 8px; /* 이미지를 둥글게 */
-            object-fit: cover; /* 이미지 비율 유지 */
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+            border-radius: 8px;
+            object-fit: cover;
         }
 
         .restaurant-name {
@@ -72,15 +72,11 @@
             color: #333;
         }
 
-        /* 마지막 요소가 홀수일 때 좌측 정렬 */
         #restaurant-list .list-box:last-child {
-            flex: 0 1 calc(50% - 20px); /* 명시적으로 50% 너비 설정 */
-            margin-right: auto; /* 우측 공백 채우기 */
+            flex: 0 1 calc(50% - 20px);
+            margin-right: auto;
         }
-
-
     </style>
-
 </head>
 <body>
     <header>
@@ -99,7 +95,7 @@
         <div class="header-container">
             <h2>Available Restaurants</h2>
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search restaurants...">
+                <input type="text" id="search-input" placeholder="Search menu...">
             </div>
         </div>
         <div id="restaurant-list" class="list-container">
@@ -108,12 +104,40 @@
     </main>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('restaurants.php')
-                .then(response => response.json())
-                .then(data => {
-                    const restaurantList = document.getElementById('restaurant-list');
+        document.addEventListener("DOMContentLoaded", function () {
+            let restaurantsData = [];
 
+            const restaurantList = document.getElementById("restaurant-list");
+            const searchInput = document.getElementById("search-input");
+
+            function renderRestaurants(data) {
+                restaurantList.innerHTML = "";
+                if (data.length === 0) {
+                    restaurantList.innerHTML = `<div class="error-message">No restaurants found.</div>`;
+                    return;
+                }
+                data.forEach((restaurant) => {
+                    const box = document.createElement("div");
+                    box.className = "list-box";
+
+                    box.innerHTML = `
+                        <div class="list-restaurant">
+                            <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
+                            <span class="restaurant-name">${restaurant.name}</span>
+                        </div>
+                    `;
+
+                    box.addEventListener("click", () => {
+                        window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                    });
+
+                    restaurantList.appendChild(box);
+                });
+            }
+
+            fetch("restaurants.php")
+                .then((response) => response.json())
+                .then((data) => {
                     if (data.redirect) {
                         alert("먼저 로그인을 해주세요");
                         window.location.href = data.redirect;
@@ -122,31 +146,22 @@
                     } else if (data.message) {
                         restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
                     } else {
-                        data.forEach(restaurant => {
-                            const box = document.createElement('div');
-                            box.className = 'list-box';
-
-                            // 카드에 이미지와 텍스트를 포함
-                            box.innerHTML = `
-                                <div class="list-restaurant">
-                                    <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
-                                    <span class="restaurant-name">${restaurant.name}</span>
-                                </div>
-                            `;
-
-                            // 클릭 이벤트 추가
-                            box.addEventListener('click', () => {
-                                window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
-                            });
-
-                            restaurantList.appendChild(box);
-                        });
+                        restaurantsData = data;
+                        renderRestaurants(restaurantsData);
                     }
                 })
-                .catch(error => {
-                    console.error('Error fetching restaurant data:', error);
-                    document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
+                .catch((error) => {
+                    console.error("Error fetching restaurant data:", error);
+                    restaurantList.innerHTML = '<div class="error-message">Error loading data.</div>';
                 });
+
+            searchInput.addEventListener("input", function () {
+                const searchValue = searchInput.value.toLowerCase();
+                const filteredData = restaurantsData.filter((restaurant) =>
+                    restaurant.menu.some((menuItem) => menuItem.toLowerCase().includes(searchValue))
+                );
+                renderRestaurants(filteredData);
+            });
         });
     </script>
 </body>
