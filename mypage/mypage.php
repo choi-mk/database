@@ -108,7 +108,7 @@ $conn->close();
     </header>
 
     <nav>
-        <a href="restaurants.html" class="current-button">Restaurants</a>
+        <a href="../restaurnats/restaurants.html" class="current-button">Restaurants</a>
         <a href="../orders/orders.html" class="orders-button">Orders</a>
         <a href="../signin/logout.php" class="logout-button">Logout</a>
     </nav>
