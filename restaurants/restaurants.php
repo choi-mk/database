@@ -35,7 +35,7 @@ if ($userAddress) {
     $address2 = $userAddress['address2'];
     $address3 = $userAddress['address3'];
 
-    $sql = "SELECT rest_id, name, address1, address2, address3 FROM restbl WHERE address1 = ? AND address2 = ? AND address3 = ?";
+    $sql = "SELECT rest_id, name, address1, address2, address3, img FROM restbl WHERE address1 = ? AND address2 = ? AND address3 = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sss", $address1, $address2, $address3);
     $stmt->execute();

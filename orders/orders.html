@@ -99,7 +99,7 @@
                         <td>${order.name}</td>
                         <td>${order.address4}</td>
                         <td>
-                            <button class="submit-btn" 
+                            <button class=".submit-btn"
                                 data-id="${order.order_id}" 
                                 data-rest-id="${order.restaurant}" 
                                 data-goal-id="${order.goal_money}" 
@@ -115,7 +115,7 @@
                 // Join 버튼 클릭 이벤트 추가
                 const joinButtons = document.querySelectorAll(".submit-btn");
                 joinButtons.forEach(button => {
-                    button.addEventListener("click", function () {
+                    button.addEventListener("click", function() {
                         const orderId = this.dataset.id;
                         const restId = this.dataset.restId;
                         const goalId = this.dataset.goalId;

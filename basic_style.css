@@ -77,6 +77,7 @@ nav a:hover {
 }
 
 .content {
+    
     padding-left: 20px; /* 내부 여백 */
     /* margin-left: 20px; */ /* 외부 여백 (필요시 사용) */
 }
@@ -100,7 +101,7 @@ nav a:hover {
 
 main {
     padding: 20px;
-    background: #fff;
+    background: #f7f7f7;;
     margin: 20px auto;
     max-width: 1000px;
 
