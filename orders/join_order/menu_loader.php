@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 
 if (isset($_GET['rest_id'])) {
     $rest_id = intval($_GET['rest_id']);
-    $menu_stmt = $conn->prepare("SELECT menu_id, food, price FROM menutbl WHERE rest_id = ?");
+    $menu_stmt = $conn->prepare("SELECT menu_id, food, price, img FROM menutbl WHERE rest_id = ?");
     $menu_stmt->bind_param("i", $rest_id);
     $menu_stmt->execute();
     $menu_result = $menu_stmt->get_result();

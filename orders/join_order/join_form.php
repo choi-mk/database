@@ -65,6 +65,7 @@ $conn->close();
                             const menuItem = document.createElement('div');
                             menuItem.className = 'menu-item';
                             menuItem.innerHTML = `
+                                <img src="../../images/${menu.img}" alt="${menu.food}" class="menu-img">
                                 <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
                                 <input type="number" id="amount-${menu.menu_id}" name="amount[${menu.menu_id}]" value="0" min="0" oninput="updateTotalPrice()">
                             `;
@@ -163,6 +164,14 @@ $conn->close();
             align-items: center; 
             margin-bottom: 10px; 
             padding-left: 20px;
+        }
+
+        .menu-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 5px;
+            object-fit: cover;
         }
 
         .menu-item label { 
