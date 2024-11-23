@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT r.name, r.rest_id, m.food, m.price FROM restbl r JOIN menutbl m ON r.rest_id = m.rest_id WHERE r.rest_id = ?";
+$sql = "SELECT r.name, r.rest_id, m.food, m.price, m.img FROM restbl r JOIN menutbl m ON r.rest_id = m.rest_id WHERE r.rest_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $rest_id);
 $stmt->execute();
@@ -28,7 +28,8 @@ while ($row = $result->fetch_assoc()) {
     }
     $menus[] = [
         'menu' => $row['food'],
-        'price' => $row['price']
+        'price' => $row['price'],
+        'img' => $row['img']
     ];
 }
 $stmt->close();
@@ -96,6 +97,45 @@ $conn->close();
             border: 1px solid #ddd; /* 테두리 추가 */
             border-radius: 5px; /* 모서리를 둥글게 */
         }
+        .menu-img {
+            width: 50px; /* 이미지 너비 */
+            height: 50px; /* 이미지 높이 */
+            margin-right: 10px; /* 텍스트와의 간격 */
+            border-radius: 5px; /* 이미지 모서리를 둥글게 */
+            object-fit: cover; /* 이미지 비율 유지 */
+        }
+
+        .list-box {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .list-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .menu-price {
+            color: #555;
+        }
+
 
         </style>
 
@@ -144,7 +184,7 @@ $conn->close();
             const menuList = document.getElementById('menu-list');
             const searchInput = document.getElementById('search-input');
             const orderList = document.getElementById('order-list');
-        
+
             // 메뉴 렌더링 함수
             function renderMenus(filteredMenus) {
                 menuList.innerHTML = ''; // 초기화
@@ -155,10 +195,14 @@ $conn->close();
                 filteredMenus.forEach(menu => {
                     const box = document.createElement('div');
                     box.className = 'list-box';
+                    box.style.display = 'flex';
+                    box.style.alignItems = 'center';
+                
                     box.innerHTML = `
+                        <img src="../images/${menu.img}" alt="${menu.menu}" class="menu-img">
                         <div class="list-menu">
-                            <span>${menu.menu}</span>
-                            <span>${menu.price.toLocaleString()} 원</span>
+                            <span class="menu-name">${menu.menu}</span>
+                            <span class="menu-price">${menu.price.toLocaleString()} 원</span>
                         </div>
                     `;
                     menuList.appendChild(box);
@@ -174,15 +218,16 @@ $conn->close();
                 );
                 renderMenus(filteredMenus);
             });
-
-            function renderCurrentOrder(orders) { // 매개변수를 orders로 변경
+        
+            // 주문 렌더링 함수
+            function renderCurrentOrder(orders) {
                 orderList.innerHTML = ''; // 초기화
-                if (!orders || orders.length === 0) { // orders 배열 체크
+                if (!orders || orders.length === 0) {
                     orderList.innerHTML = '<div class="error-message">No items in the current order.</div>';
                     return;
                 }
             
-                orders.forEach(item => { // orders를 순회
+                orders.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.order_id}</td>
@@ -201,21 +246,7 @@ $conn->close();
                             </button>
                         </td>
                     `;
-                    orderList.appendChild(row); // orderList에 row 추가
-
-                    // Join 버튼 클릭 이벤트 추가
-                    const joinButtons = document.querySelectorAll(".join-button");
-                    joinButtons.forEach(button => {
-                        button.addEventListener("click", function () {
-                            const orderId = this.dataset.id;
-                            const restId = this.dataset.restId;
-                            const goalId = this.dataset.goalId;
-                            const curId = this.dataset.curId;
-                            const timeId = this.dataset.timeId;
-                            // URL에 식당 ID와 주문 ID 포함
-                            window.location.href = `../orders/join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
-                        });
-                    });
+                    orderList.appendChild(row);
                 });
             }
             renderCurrentOrder(orders);
