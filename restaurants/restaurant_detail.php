@@ -146,6 +146,12 @@ $conn->close();
         <a href="../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
+        <div class="nickname-block">
+            <button id="nickname-button" class="nickname-button" 
+                onclick="window.location.href='../mypage/mypage.php'">
+                <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+            </button>
+        </div>
     </header>
 
     <nav>
@@ -260,6 +266,19 @@ $conn->close();
                         </td>
                     `;
                     orderList.appendChild(row);
+                    // Join 버튼 클릭 이벤트 추가
+                    const joinButtons = document.querySelectorAll(".submit-btn");
+                    joinButtons.forEach(button => {
+                        button.addEventListener("click", function () {
+                            const orderId = this.dataset.id;
+                            const restId = this.dataset.restId;
+                            const goalId = this.dataset.goalId;
+                            const curId = this.dataset.curId;
+                            const timeId = this.dataset.timeId;
+                            // URL에 식당 ID와 주문 ID 포함
+                            window.location.href = `../orders/join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
+                        });
+                    });
                 });
             }
             renderCurrentOrder(orders);

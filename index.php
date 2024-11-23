@@ -31,8 +31,12 @@ $is_logged_in = isset($_SESSION['phone']);  // 세션에 phone이 저장되어 �
         
         <!-- 오른쪽 위에 위치할 닉네임 블록 -->
         <div class="nickname-block">
-            <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+            <button id="nickname-button" class="nickname-button" 
+                onclick="window.location.href='mypage/mypage.php'">
+                <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+            </button>
         </div>
+
     <?php else: ?>
         <!-- 로그인 안 했을 때 -->
         <a href="restaurants/restaurants.html">Restaurants</a>

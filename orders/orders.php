@@ -54,7 +54,10 @@ if ($stmt->execute()) {
         $orders[] = $row;
     }
 
-    echo json_encode($orders);
+    echo json_encode([
+        'nickname' => $nickname,
+        'orders' => $orders
+    ]);
 } else {
     echo json_encode(["error" => "Query execution failed: " . $stmt->error]);
 }

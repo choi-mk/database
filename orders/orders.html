@@ -34,6 +34,11 @@
         <a href="../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
+        <div class="nickname-block">
+            <button id="nickname-button" class="nickname-button">
+                <span id="user-nickname"></span> 님
+            </button>
+        </div>
     </header>
 
     <nav>
@@ -75,64 +80,70 @@
 <a href="neworder/neworder_form.php" class="floating-button">+</a>
     <script>
        document.addEventListener("DOMContentLoaded", function () {
-    fetch('orders.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.redirect) {
-                alert("먼저 로그인을 해주세요");
-                window.location.href = data.redirect;
-                return;
-            }
+        const nicknameButton = document.getElementById('nickname-button');
+            nicknameButton.addEventListener('click', () => {
+                window.location.href = '../mypage/mypage.php'; // 이동하려는 파일 경로
+            });
+            fetch('orders.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.redirect) {
+                        alert("먼저 로그인을 해주세요");
+                        window.location.href = data.redirect;
+                        return;
+                    }
 
-            const orderRows = document.getElementById('order-rows');
+                    const orderRows = document.getElementById('order-rows');
+                    const userNickname = document.getElementById('user-nickname');
 
-            if (data.message) {
-                orderRows.innerHTML = `<tr><td colspan="6">${data.message}</td></tr>`;
-            } else {
-                data.forEach(order => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${order.order_id}</td>
-                        <td>${order.time}</td>
-                        <td>${order.goal_money}</td>
-                        <td>${order.current_money}</td>
-                        <td>${order.name}</td>
-                        <td>${order.address4}</td>
-                        <td>
-                            <button class="submit-btn" 
-                                data-id="${order.order_id}" 
-                                data-rest-id="${order.restaurant}" 
-                                data-goal-id="${order.goal_money}" 
-                                data-cur-id="${order.current_money}" 
-                                data-time-id="${order.time}">
-                                Join
-                            </button>
-                        </td>
-                    `;
-                    orderRows.appendChild(row);
+                    if (data.message) {
+                        orderRows.innerHTML = `<tr><td colspan="6">${data.message}</td></tr>`;
+                    } else {
+                        userNickname.textContent = data.nickname;
+                        data.orders.forEach(order => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${order.order_id}</td>
+                                <td>${order.time}</td>
+                                <td>${order.goal_money}</td>
+                                <td>${order.current_money}</td>
+                                <td>${order.name}</td>
+                                <td>${order.address4}</td>
+                                <td>
+                                    <button class="submit-btn" 
+                                        data-id="${order.order_id}" 
+                                        data-rest-id="${order.restaurant}" 
+                                        data-goal-id="${order.goal_money}" 
+                                        data-cur-id="${order.current_money}" 
+                                        data-time-id="${order.time}">
+                                        Join
+                                    </button>
+                                </td>
+                            `;
+                            orderRows.appendChild(row);
+                        });
+
+                        // Join 버튼 클릭 이벤트 추가
+                        const joinButtons = document.querySelectorAll(".submit-btn");
+                        joinButtons.forEach(button => {
+                            button.addEventListener("click", function () {
+                                const orderId = this.dataset.id;
+                                const restId = this.dataset.restId;
+                                const goalId = this.dataset.goalId;
+                                const curId = this.dataset.curId;
+                                const timeId = this.dataset.timeId;
+
+                                // URL에 식당 ID와 주문 ID 포함
+                                window.location.href = `join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                    document.getElementById('order-rows').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
                 });
-
-                // Join 버튼 클릭 이벤트 추가
-                const joinButtons = document.querySelectorAll(".submit-btn");
-                joinButtons.forEach(button => {
-                    button.addEventListener("click", function () {
-                        const orderId = this.dataset.id;
-                        const restId = this.dataset.restId;
-                        const goalId = this.dataset.goalId;
-                        const curId = this.dataset.curId;
-                        const timeId = this.dataset.timeId;
-
-                        // URL에 식당 ID와 주문 ID 포함
-                        window.location.href = `join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
-                    });
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching orders:', error);
-            document.getElementById('order-rows').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
         });
-});
 
 
 

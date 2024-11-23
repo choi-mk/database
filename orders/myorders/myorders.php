@@ -160,7 +160,10 @@ $conn->close();
         <?php if ($is_logged_in): ?>
             <!-- 로그인 상태일 때 닉네임 표시 -->
             <div class="nickname-block">
-                <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+                <button id="nickname-button" class="nickname-button" 
+                    onclick="window.location.href='../../mypage/mypage.php'">
+                    <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+                </button>
             </div>
         <?php endif; ?>
     </header>
