@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT r.name, r.rest_id, m.food, m.price, m.img FROM restbl r JOIN menutbl m ON r.rest_id = m.rest_id WHERE r.rest_id = ?";
+$sql = "SELECT r.name, r.rest_id, m.food, m.price, m.img, r.minprice FROM restbl r JOIN menutbl m ON r.rest_id = m.rest_id WHERE r.rest_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $rest_id);
 $stmt->execute();
@@ -22,9 +22,11 @@ $result = $stmt->get_result();
 
 $menus = [];
 $restaurant_name = null;
+$minprice = null;
 while ($row = $result->fetch_assoc()) {
-    if (!$restaurant_name) {
+    if (!$restaurant_name or !$minprice) {
         $restaurant_name = $row['name']; // 레스토랑 이름 저장
+        $minprice = $row['minprice'];
     }
     $menus[] = [
         'menu' => $row['food'],
@@ -46,6 +48,19 @@ while ($row = $result->fetch_assoc()) {
     $orders[] =  $row;
 }
 $stmt->close();
+
+$sql = "SELECT d.amount, d.fee FROM deliveryfee d WHERE d.rest_id = ?;";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $rest_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$fees = [];
+while ($row = $result->fetch_assoc()) {
+    $fees[] =  $row;
+}
+$stmt->close();
+
 $conn->close();
 ?>
 
@@ -136,6 +151,47 @@ $conn->close();
             color: #555;
         }
 
+        #delivery-fee {
+            margin-bottom: 20px; /* 배달료와 Current Order 사이 간격 */
+            padding: 18px;
+        }
+        #delivery-fee .min-price {
+            margin-bottom: 5px; /* 최소 주문 금액과 배달료 리스트 사이 간격 */
+        }
+        #delivery-fee .fee-list {
+            margin-top: 0; /* 배달료 리스트 위쪽 간격 제거 */
+            list-style-type: none; /* 불릿 제거 */
+            padding-left: 20px;
+        }
+
+        .fee-list li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        h4 + #delivery-fee {
+            margin-top: -5px; /* 간격을 5px로 줄임 */
+        }
+
+        h4 {
+            font-weight: bold;
+            padding-left: 15px;
+            margin-bottom: 0px; /* h4의 아래쪽 여백을 줄임 */
+        }
+
+        .details-button {
+            background-color: #f1f1f1; /* 연한 회색 배경 */
+            border: 0px; 
+            border-radius: 4px; /* 둥근 모서리 */
+            padding: 5px 5px; /* 버튼 내부 여백 */
+            font-size: 11px; /* 글자 크기 */
+        }
+
+        .details-button:active {
+            background-color: #0056b3; /* 클릭 시 더 어두운 파란색 배경 */
+            border-color: #003f7f; /* 클릭 시 테두리 색상 */
+        }
+
+
 
         </style>
 
@@ -153,7 +209,6 @@ $conn->close();
             </button>
         </div>
     </header>
-
     <nav>
         <a href="restaurants.html" class="current-button">Restaurants</a>
         <a href="../orders/orders.html" class="orders-button">Orders</a>
@@ -174,6 +229,10 @@ $conn->close();
     
         <!-- 우측: Current Order -->
         <div class="right-pane">
+            <h4>Delivery fee</h4>
+            <div id="delivery-fee" >
+                <!-- 최소주문금액 r.minprice, amount별 배달 fee 표시-->
+            </div>
             <h2>Current Order</h2>
             <div id="order-list" class="order-container">
                 <!-- JavaScript로 현재 주문 내용이 여기에 추가됩니다 -->
@@ -186,8 +245,71 @@ $conn->close();
     <script>
         const menus = <?= json_encode($menus) ?>;
         const orders = <?= json_encode($orders) ?>;
+        const fees = <?= json_encode($fees) ?>;
+        const minPrice = <?= json_encode($minprice) ?>;
+
+        console.log('Menus:', menus);
+        console.log('Orders:', orders);
+        console.log('Fees:', fees);
 
         document.addEventListener("DOMContentLoaded", function () {
+            const deliveryFeeContainer = document.getElementById('delivery-fee');
+
+            function renderDeliveryFee(fees, minPrice) {
+                deliveryFeeContainer.innerHTML = ''; // 기존 내용을 초기화
+
+                const minFee = fees.length > 0 ? Math.min(...fees.map(fee => fee.fee)) : 0;
+                const maxFee = fees.length > 0 ? Math.max(...fees.map(fee => fee.fee)) : 0;
+
+                // 최소 주문 금액 표시
+                const minPriceElement = document.createElement('div');
+                minPriceElement.className = 'min-price';
+                minPriceElement.innerHTML = `최소 주문 금액: ${minPrice.toLocaleString()} 원`;
+                deliveryFeeContainer.appendChild(minPriceElement);
+
+                const deliveryFeeInfo = document.createElement('div');
+                deliveryFeeInfo.className = 'delivery-fee-info';
+                deliveryFeeInfo.innerHTML = `배달비: ${minFee.toLocaleString()} ~ ${maxFee.toLocaleString()} 원`;
+
+                const detailsButton = document.createElement('button');
+                detailsButton.textContent = '[자세히]';
+                detailsButton.style.marginLeft = '10px';
+                detailsButton.style.cursor = 'pointer';
+                detailsButton.className = 'details-button';
+
+                detailsButton.addEventListener('click', function () {
+                    feeList.style.display = feeList.style.display === 'none' ? 'block' : 'none';
+                    detailsButton.textContent = feeList.style.display === 'none' ? '[자세히]' : '[접기]';
+                });
+
+                deliveryFeeInfo.appendChild(detailsButton);
+                deliveryFeeContainer.appendChild(deliveryFeeInfo);
+            
+                // 배달료 리스트 표시
+                if (fees.length === 0) {
+                    deliveryFeeContainer.innerHTML += '<div class="error-message">배달료 정보가 없습니다.</div>';
+                    return;
+                }
+            
+                const feeList = document.createElement('ul');
+                feeList.className = 'fee-list';
+                feeList.style.display = 'none'; // 기본적으로 숨김 처리
+
+            
+                fees.forEach(fee => {
+                    const feeItem = document.createElement('li');
+                    feeItem.innerHTML = `
+                        <span>${fee.amount.toLocaleString()} 원 이상: ${fee.fee.toLocaleString()} 원</span>
+                    `;
+                    feeList.appendChild(feeItem);
+                });
+            
+                deliveryFeeContainer.appendChild(feeList);
+            }
+        
+            // 데이터 렌더링
+            
+            renderDeliveryFee(fees, minPrice);
             const floatingButton = document.getElementById("new-order-btn");
 
             floatingButton.addEventListener("click", function (event) {

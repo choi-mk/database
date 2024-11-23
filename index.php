@@ -46,8 +46,16 @@ $is_logged_in = isset($_SESSION['phone']);  // 세션에 phone이 저장되어 �
 </nav>
 
 <div class="content">
+<<<<<<< HEAD
     <h2>What is Moju?</h2>
     <p>This is the home page of the website.</p>
+=======
+    <h1>MoJu-모두의 주문</h1>
+    <p>모두의 주문이란?</p>
+    <p>가까운 곳에 사는 사람들끼리 같이 주문을 할 수 있는 웹서비스예요!</p>
+    <p>커피 한 잔만 배달시키고 싶을 때, 비싼 배달비가 부담스러울 때!</p>
+    <p>모두의 주문, MoJu와 함께 즐거운 배달 생활을 즐겨보세요!</p>
+>>>>>>> efaca3df3d29173d5c7ea172b9fe5b7a69990309
 </div>
 
 </body>
