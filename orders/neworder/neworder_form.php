@@ -18,6 +18,25 @@ if ($conn->connect_error) {
 // 세션에서 사용자 번호 가져오기
 $phone = $_SESSION['phone'];
 
+// restaurant 페이지에서 연결된 경우
+$rest_id = isset($_GET['rest_id']) ? htmlspecialchars($_GET['rest_id']) : null;
+
+if ($rest_id) {
+    // 전달된 rest_id의 유효성 확인
+    $stmt = $conn->prepare("SELECT name FROM restbl WHERE rest_id = ?");
+    $stmt->bind_param("i", $rest_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $restaurant = $result->fetch_assoc();
+        $selected_restaurant_name = $restaurant['name'];
+    } else {
+        $error_message = "Invalid Restaurant ID.";
+    }
+    $stmt->close();
+}
+
 // 식당 목록 가져오기
 $stmt = $conn->prepare(
     "SELECT r.rest_id, r.name 
@@ -46,6 +65,15 @@ $conn->close();
     <link rel="stylesheet" href="../../basic_style.css">
     <title>New Order</title>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const restId = "<?= $rest_id ?? '' ?>"; // PHP에서 전달된 rest_id
+
+            if (restId) {
+                const restaurantSelect = document.getElementById("restaurant");
+                restaurantSelect.value = restId; // 전달된 rest_id를 선택값으로 설정
+                loadMenu(); // 선택된 레스토랑의 메뉴 로드
+            }
+        });
         let menuPrices = {};
 
         function loadMenu() {
@@ -63,7 +91,8 @@ $conn->close();
                         
                             const menuItem = document.createElement('div');
                             menuItem.className = 'menu-item';
-                            menuItem.innerHTML = `
+                            menuItem.innerHTML = `  
+                                <img src="../../images/${menu.img}" alt="${menu.food}" class="menu-img">
                                 <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
                                 <input type="number" id="amount-${menu.menu_id}" name="amount[${menu.menu_id}]" value="0" min="0" oninput="updateTotalPrice()">
                             `;
@@ -148,25 +177,37 @@ $conn->close();
             text-align: center; 
         }
 
-        .menu-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 10px; 
-            padding-left: 20px;
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .menu-item label { 
-            flex: 1; 
-            margin-right: 10px; 
+        .menu-img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 5px;
+            object-fit: cover;
         }
 
-        .menu-item input { 
-            width: 60px; /* 수량 입력 칸의 너비 */ 
-            text-align: right; 
-            padding: 6px; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
+        .menu-item label {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .menu-item input {
+            width: 60px; /* 수량 입력 칸의 너비 */
+            text-align: right;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 
@@ -181,7 +222,8 @@ $conn->close();
             <select id="restaurant" name="restaurant" required onchange="loadMenu()">
                 <option value="">Choose Restaurant</option>
                 <?php foreach ($restaurants as $restaurant): ?>
-                    <option value="<?= htmlspecialchars($restaurant['rest_id']) ?>">
+                    <option value="<?= htmlspecialchars($restaurant['rest_id']) ?>"
+                        <?= ($restaurant['rest_id'] == $rest_id) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($restaurant['name']) ?>
                     </option>
                 <?php endforeach; ?>
