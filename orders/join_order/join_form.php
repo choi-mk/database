@@ -204,7 +204,7 @@ $conn->close();
         <div class="input-group">
             <div id="total-price" style="margin-top: 10px;">
                 현재 금액: <?= htmlspecialchars($selected_cur_id ?? '0') ?>원
-                (목표 금액 까지 <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>원)
+                (목표 금액  <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>원)
             </div>
         </div>
 
@@ -214,7 +214,7 @@ $conn->close();
 
         <!-- 제출 버튼 -->
         <div class= "input-group" >
-            <button type="submit" class="submit-btn">Join Order</button>
+            <button type="join" class="submit-btn">Join Order</button>
         </div>
     </form>
 </div>

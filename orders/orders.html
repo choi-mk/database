@@ -60,7 +60,9 @@
                         <th>Goal Money</th>
                         <th>Current Money</th>
                         <th>Restaurant</th>
+                        <th>Delivery Address</th>
                         <th>Action</th>
+                        
                     </tr>
                 </thead>
                 <tbody id="order-rows">
@@ -95,6 +97,7 @@
                         <td>${order.goal_money}</td>
                         <td>${order.current_money}</td>
                         <td>${order.name}</td>
+                        <td>${order.address4}</td>
                         <td>
                             <button class="submit-btn" 
                                 data-id="${order.order_id}" 
@@ -110,7 +113,7 @@
                 });
 
                 // Join 버튼 클릭 이벤트 추가
-                const joinButtons = document.querySelectorAll(".join-button");
+                const joinButtons = document.querySelectorAll(".submit-btn");
                 joinButtons.forEach(button => {
                     button.addEventListener("click", function () {
                         const orderId = this.dataset.id;

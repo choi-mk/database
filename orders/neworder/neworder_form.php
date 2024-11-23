@@ -57,7 +57,7 @@ $conn->close();
                 fetch(`menu_loader.php?rest_id=${restId}`)
                     .then(response => response.json())
                     .then(data => {
-                        menuContainer.innerHTML = '<strong>메뉴</strong>';
+                        menuContainer.innerHTML = '<strong>Menu</strong>';
                         data.forEach(menu => {
                             menuPrices[menu.menu_id] = menu.price;
                         
@@ -85,7 +85,7 @@ $conn->close();
                 const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
                 totalPrice += menuPrices[menuId] * amount;
             }
-            document.getElementById('total-price').innerHTML = `총 가격: ${totalPrice.toLocaleString()} 원`;
+            document.getElementById('total-price').innerHTML = `Total Price: ${totalPrice.toLocaleString()} 원`;
         }
     </script>
     <style>
@@ -177,9 +177,9 @@ $conn->close();
 
     <form action="neworder.php" method="post">
         <div class="input-group">
-            <label for="restaurant"><h3>주문할 식당</h3></label>
+            <label for="restaurant"><h3>Restaurant to Order</h3></label>
             <select id="restaurant" name="restaurant" required onchange="loadMenu()">
-                <option value="">식당을 선택하세요</option>
+                <option value="">Choose Restaurant</option>
                 <?php foreach ($restaurants as $restaurant): ?>
                     <option value="<?= htmlspecialchars($restaurant['rest_id']) ?>">
                         <?= htmlspecialchars($restaurant['name']) ?>
@@ -190,15 +190,19 @@ $conn->close();
 
         <div id="menu-container"></div>
 
-        <div id="total-price" style="margin-top: 10px; font-weight: bold;">총 가격: 0 원</div>
+        <div id="total-price" style="margin-top: 10px; font-weight: bold;">Total Price: 0 원</div>
 
         <div class="form-group">
-            <label for="time"><br>주문 마감 시간</label>
+            <label for="time"><br>Order Closing Time</label>
             <input type="datetime-local" id="time" name="time" required>
         </div>
         <div class="form-group">
-            <label for="goal_money">목표 금액</label>
+            <label for="goal_money">Goal Money</label>
             <input type="number" id="goal_money" name="goal_money" required>
+        </div>
+        <div class="form-group">
+            <label for="goal_money">Delivery Address</label>
+            <input type="text" id="delivery_address" name="delivery_address" required>
         </div>
         <button type="submit" class="submit-btn">New Order</button>
     </form>

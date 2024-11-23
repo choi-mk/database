@@ -56,9 +56,51 @@ $conn->close();
     <title>Restaurants</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <link rel="stylesheet" href="../basic_style.css">
+    <style>
+        .split-container {
+            display: flex; /* Flexbox를 사용하여 좌우 정렬 */
+            justify-content: space-between; /* 좌우로 요소를 정렬 */
+            gap: 20px; /* 좌우 패널 사이의 간격 */
+            padding: 20px; /* 컨테이너 내부 여백 */
+            max-width: 1200px; /* 컨테이너의 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            box-sizing: border-box;
+        }
 
+        .left-pane, .right-pane {
+            flex: 1; /* 좌우 패널이 동일한 크기를 가짐 */
+            min-width: 300px; /* 패널의 최소 너비 */
+            background-color: #f9f9f9; /* 패널의 배경색 */
+            padding: 20px; /* 패널 내부 여백 */
+            border-radius: 8px; /* 모서리 둥글게 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 추가 */
+        }
+
+        .left-pane {
+            /* 추가 스타일이 필요하면 여기에 작성 */
+        }
+
+        .right-pane {
+            /* 추가 스타일이 필요하면 여기에 작성 */
+        }
+
+        .search-bar {
+            margin-bottom: 20px; /* 검색창과 메뉴 리스트 사이의 간격 */
+        }
+
+        .list-container, .order-container {
+            max-height: 500px; /* 리스트 영역의 최대 높이 설정 */
+            overflow-y: auto; /* 세로 스크롤 활성화 */
+            background-color: #ffffff; /* 리스트 배경색 */
+            padding: 10px;
+            border: 1px solid #ddd; /* 테두리 추가 */
+            border-radius: 5px; /* 모서리를 둥글게 */
+        }
+
+        </style>
 
 </head>
+
 <body>
     <header>
         <a href="../index.php" class="header-link">
@@ -147,9 +189,9 @@ $conn->close();
                         <td>${item.time}</td>
                         <td>${item.goal_money}</td>
                         <td>${item.current_money}</td>
-                        <td>${item.name}</td>
+                        <td>${item.address4}</td>
                         <td>
-                            <button class="join-button" 
+                            <button class="submit-btn" 
                                 data-id="${item.order_id}" 
                                 data-rest-id="${item.restaurant}" 
                                 data-goal-id="${item.goal_money}" 

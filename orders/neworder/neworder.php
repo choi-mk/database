@@ -7,9 +7,10 @@ $time = $_POST['time'];
 $goal_money = $_POST['goal_money'];
 $amount_data = $_POST['amount'];
 $phone = $_SESSION['phone'];
+$delivery_address = $_POST['delivery_address'];
 
 // 데이터 유효성 검사 (예: 비어있는 필드가 없는지 확인)
-if (empty($restaurant) || empty($time) || empty($goal_money) || empty($amount_data)) {
+if (empty($restaurant) || empty($time) || empty($goal_money) || empty($amount_data) || empty($delivery_address)) {
     $error = "모든 필드를 입력해주세요.";
     echo "<script>alert('" . addslashes($error) . "'); history.back();</script>";
     exit;
@@ -53,10 +54,10 @@ foreach ($amount_data as $menu => $amount) {
 
 // ordertbl에 데이터 삽입
 $stmt = $conn->prepare(
-    "INSERT INTO ordertbl (time, state, current_money, goal_money, participants_num, cur_deliver, leader, restaurant) 
-     VALUES (?, 'active', ?, ?, 1, ?, ?, ?)"
+    "INSERT INTO ordertbl (time, state, current_money, goal_money, participants_num, cur_deliver, leader, restaurant, address4) 
+     VALUES (?, 'active', ?, ?, 1, ?, ?, ?, ?)"
 );
-$stmt->bind_param("siiiis", $time, $current_money, $goal_money, $cur_deliver, $phone, $restaurant);
+$stmt->bind_param("siiiiss", $time, $current_money, $goal_money, $cur_deliver, $phone, $restaurant, $delivery_address);
 
 if ($stmt->execute()) {
     $order_id = $conn->insert_id; // 삽입된 order_id 가져오기
