@@ -48,15 +48,19 @@ $conn->query($update_sql_inactive);
 
 // 2. SELECT 쿼리 실행 (Prepared Statement 사용)
 $select_sql = "
-    SELECT o.*, r.name 
-    FROM ordertbl o
+    SELECT o.*, r.name, r.img
+    FROM jointbl j
+    JOIN ordertbl o ON j.order_id = o.order_id
     JOIN restbl r ON o.restaurant = r.rest_id
     JOIN deliverable d ON r.rest_id = d.rest_id 
-    WHERE o.state = 'active' AND d.phone = ?
+    WHERE j.mem_id != ? and o.state = 'active' AND d.phone = ?
+    AND o.order_id NOT IN (SELECT DISTINCT order_id FROM jointbl WHERE mem_id = ?)
+    GROUP BY o.order_id
+    ORDER BY o.order_id ASC;
 ";
 
 $stmt = $conn->prepare($select_sql);
-$stmt->bind_param("s", $phone);
+$stmt->bind_param("sss", $phone, $phone, $phone);
 
 if ($stmt->execute()) {
     $result = $stmt->get_result();
