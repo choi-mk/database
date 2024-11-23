@@ -57,6 +57,10 @@
                                 </div>
                             `;
 
+                            box.addEventListener('click', () => {
+                                window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                            });
+
                             restaurantList.appendChild(box);
                         });
                     }
