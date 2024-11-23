@@ -10,6 +10,8 @@ if (!isset($_SESSION['phone'])) {
     exit;
 }
 
+
+
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
 $username = "admin";
 $password = "00000000";
@@ -22,6 +24,8 @@ if ($conn->connect_error) {
 }
 
 $phone = $_SESSION['phone'];
+$nickname = $_SESSION['nickname'];
+
 
 $sql = "SELECT address1, address2, address3 FROM memtbl WHERE phone = ?";
 $stmt = $conn->prepare($sql);
@@ -64,7 +68,10 @@ if ($userAddress) {
     }
 
     if (count($restaurants) > 0) {
-        echo json_encode($restaurants);
+        echo json_encode([
+            'nickname' => $nickname,
+            'restaurants' => $restaurants
+        ]);
     } else {
         echo json_encode(["message" => "배달가능한 식당이 없습니다"]);
     }

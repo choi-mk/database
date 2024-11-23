@@ -9,6 +9,8 @@ if (!isset($_SESSION['phone'])) {
     exit;
 }
 
+$nickname = $_SESSION['nickname'];
+
 // 사용자 ID 가져오기
 $phone = $_SESSION['phone'];
 

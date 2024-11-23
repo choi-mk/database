@@ -13,18 +13,18 @@
             margin: 20px auto;
             max-width: 1000px;
         }
+        
 
-        /* header-container 스타일 수정 */
         .header-container {
             display: flex;
-            align-items: center; /* 세로 중앙 정렬 */
-            justify-content: flex-start; /* 검색바를 왼쪽으로 정렬 */
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        /* 검색바 스타일 */
+
         .search-bar {
-            margin-right: 20px; /* 검색바와 다른 요소 간의 간격 */
+            margin-right: 20px;
         }
 
         .search-bar input {
@@ -37,14 +37,14 @@
         #restaurant-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px; /* 요소 간 간격 */
-            justify-content: flex-start; /* 왼쪽 정렬 */
+            gap: 20px;
+            justify-content: flex-start;
         }
 
         .list-box {
-            display: flex; /* 이미지와 텍스트를 나란히 배치 */
-            align-items: center; /* 세로 정렬 */
-            flex: 0 1 calc(50% - 20px); /* 2단 레이아웃 */
+            display: flex;
+            align-items: center;
+            flex: 0 1 calc(50% - 20px);
             box-sizing: border-box;
             padding: 20px;
             border: 1px solid #ccc;
@@ -61,15 +61,15 @@
 
         .list-restaurant {
             display: flex;
-            align-items: center; /* 텍스트와 이미지가 가운데 정렬 */
+            align-items: center;
         }
 
         .restaurant-img {
-            width: 80px; /* 이미지 크기 설정 */
-            height: 80px; /* 이미지 크기 설정 */
-            margin-right: 15px; /* 텍스트와 간격 */
-            border-radius: 8px; /* 이미지를 둥글게 */
-            object-fit: cover; /* 이미지 비율 유지 */
+            width: 80px;
+            height: 80px;
+            margin-right: 15px;
+            border-radius: 8px;
+            object-fit: cover;
         }
 
         .restaurant-name {
@@ -78,21 +78,18 @@
             color: #333;
         }
 
-        /* 마지막 요소가 홀수일 때 좌측 정렬 */
         #restaurant-list .list-box:last-child {
-            flex: 0 1 calc(50% - 20px); /* 명시적으로 50% 너비 설정 */
-            margin-right: auto; /* 우측 공백 채우기 */
+            flex: 0 1 calc(50% - 20px);
+            margin-right: auto;
         }
-
-
     </style>
-
 </head>
 <body>
     <header>
         <a href="../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
+        <div class="nickname-block"> <span id="user-nickname"></span> 님</div>
     </header>
 
     <nav>
@@ -105,6 +102,8 @@
         <div class="header-container">
             <h2>Available Restaurants</h2>
             
+            <!-- 사용자 닉네임을 표시할 곳 -->
+            
         </div>
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="Search restaurants...">
@@ -116,74 +115,70 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    let allRestaurants = []; // 모든 레스토랑 목록을 저장할 배열
+            fetch('restaurants.php')
+                .then(response => response.json())
+                .then(data => {
+                    const restaurantList = document.getElementById('restaurant-list');
+                    const userNickname = document.getElementById('user-nickname');
 
-    fetch('restaurants.php')
-        .then(response => response.json())
-        .then(data => {
-            const restaurantList = document.getElementById('restaurant-list');
+                    if (data.redirect) {
+                        alert("먼저 로그인을 해주세요");
+                        window.location.href = data.redirect;
+                    } else if (data.error) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
+                    } else if (data.message) {
+                        restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
+                    } else {
+                        // 사용자의 닉네임 표시
+                        userNickname.textContent = data.nickname;
 
-            if (data.redirect) {
-                alert("먼저 로그인을 해주세요");
-                window.location.href = data.redirect;
-            } else if (data.error) {
-                restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
-            } else if (data.message) {
-                restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
-            } else {
-                allRestaurants = data; // 데이터를 allRestaurants 배열에 저장
-                displayRestaurants(allRestaurants); // 초기 레스토랑 목록을 표시
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching restaurant data:', error);
-            document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
-        });
-
-    // 검색 입력 필터링
-    document.getElementById('search-input').addEventListener('input', function(event) {
-        const searchQuery = event.target.value.toLowerCase();
-        const filteredRestaurants = allRestaurants.filter(restaurant => {
-            // 메뉴에 검색어가 포함된 레스토랑만 필터링
-            return restaurant.menu.some(item => item.food.toLowerCase().includes(searchQuery));
-        });
-        displayRestaurants(filteredRestaurants); // 필터링된 레스토랑 목록 표시
-    });
-
-    // 레스토랑 목록을 화면에 표시하는 함수
-    function displayRestaurants(restaurants) {
-        const restaurantList = document.getElementById('restaurant-list');
-        restaurantList.innerHTML = ''; // 기존 목록을 초기화
-
-        if (restaurants.length === 0) {
-            restaurantList.innerHTML = '<div class="error-message">No restaurants found.</div>';
-        } else {
-            restaurants.forEach(restaurant => {
-                const box = document.createElement('div');
-                box.className = 'list-box';
-
-                // 카드에 이미지와 텍스트를 포함
-                box.innerHTML = `
-                    <div class="list-restaurant">
-                        <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
-                        <span class="restaurant-name">${restaurant.name}</span>
-                    </div>
-                `;
-
-                // 클릭 이벤트 추가
-                box.addEventListener('click', () => {
-                    window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                        const allRestaurants = data.restaurants; // JSON에서 받은 레스토랑 데이터
+                        displayRestaurants(allRestaurants); // 초기 레스토랑 목록을 표시
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching restaurant data:', error);
+                    document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
                 });
 
-                restaurantList.appendChild(box);
+            // 검색 입력 필터링
+            document.getElementById('search-input').addEventListener('input', function(event) {
+                const searchQuery = event.target.value.toLowerCase();
+                const filteredRestaurants = allRestaurants.filter(restaurant => {
+                    return restaurant.menu.some(item => item.food.toLowerCase().includes(searchQuery));
+                });
+                displayRestaurants(filteredRestaurants);
             });
-        }
-    }
-});
 
+            // 레스토랑 목록을 화면에 표시하는 함수
+            function displayRestaurants(restaurants) {
+                const restaurantList = document.getElementById('restaurant-list');
+                restaurantList.innerHTML = ''; // 기존 목록을 초기화
 
+                if (restaurants.length === 0) {
+                    restaurantList.innerHTML = '<div class="error-message">No restaurants found.</div>';
+                } else {
+                    restaurants.forEach(restaurant => {
+                        const box = document.createElement('div');
+                        box.className = 'list-box';
 
+                        box.innerHTML = `
+                            <div class="list-restaurant">
+                                <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
+                                <span class="restaurant-name">${restaurant.name}</span>
+                            </div>
+                        `;
 
+                        // 클릭 이벤트 추가
+                        box.addEventListener('click', () => {
+                            window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                        });
+
+                        restaurantList.appendChild(box);
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>
