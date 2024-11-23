@@ -35,13 +35,16 @@ if ($result->num_rows > 0) {
 // 정보 업데이트 처리
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
+    $nickname = $_POST['nickname'];
+    $account = $_POST['account'];
+
     $address1 = $_POST['address1'];
     $address2 = $_POST['address2'];
     $address3 = $_POST['address3'];
 
-    $update_sql = "UPDATE memtbl SET name = ?, email = ?, address = ? WHERE phone = ?";
+    $update_sql = "UPDATE memtbl SET name = ?, nickname = ?, account = ?, address1 = ?, address2 = ?, address3 = ? WHERE phone = ?";
     $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("ssss", $name, $email, $address, $phone);
+    $update_stmt->bind_param("sssssss", $name, $nickname, $account, $address1, $address2, $address3, $phone);
     
     if ($update_stmt->execute()) {
         $success_message = "Profile updated successfully.";
@@ -72,9 +75,9 @@ $conn->close();
             max-width: 600px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #f7f7f7;
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            
         }
         .submit-btn {
             width: 100%;
@@ -89,6 +92,11 @@ $conn->close();
         .submit-btn:hover {
             background-color: var(--title-color);
         }
+
+        .input-group input {
+            margin-bottom: 5px; /* 입력 필드 간 간격 설정 */
+        }
+
     </style>
 </head>
 <body>
@@ -96,7 +104,7 @@ $conn->close();
         <a href="../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
-            <div class="nickname-block">
+        <div class="nickname-block">
                 <button id="nickname-button" class="nickname-button" 
                     onclick="window.location.href='mypage.php'">
                     <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
@@ -119,7 +127,13 @@ $conn->close();
         <?php if (isset($error_message)): ?>
             <div class="error"><?php echo $error_message; ?></div>
         <?php endif; ?>
+
+        <div class="input-group">
+            <label for="phone">PhoneNumber:</label>
+            <span id="phone"><?php echo htmlspecialchars($user['phone']); ?></span>
+        </div>
         
+        <h3>Update Profile</h3>
         <form method="POST" action="">
             <div class="input-group">
                 <label for="name">Name:</label>
@@ -129,10 +143,7 @@ $conn->close();
                 <label for="nickname">Nickname:</label>
                 <input type="nickname" id="nickname" name="nickname" value="<?php echo htmlspecialchars($user['nickname']); ?>" required>
             </div>
-            <div class="input-group">
-                <label for="phone">PhoneNumber:</label>
-                <input type="phone" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone']); ?>" required>
-            </div>
+            
             <div class="input-group">
                 <label for="account">Account:</label>
                 <input type="account" id="account" name="account" value="<?php echo htmlspecialchars($user['account']); ?>" required>
