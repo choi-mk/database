@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 $phone = $_SESSION['phone'];
 
 // 준비된 쿼리 사용
-$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state 
+$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state, r.img
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
@@ -45,7 +45,8 @@ while ($row = $result->fetch_assoc()) {
             'name' => $row['name'],
             'foods' => [],
             'price' => 0,
-            'state' => $row['state']
+            'state' => $row['state'], 
+            'img' => $row['img']
         ];
     }
     $orders_grouped[$order_id]['foods'][] = $row['food'];
@@ -64,6 +65,87 @@ $conn->close();
     <title>My Orders</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sour+Gummy&display=swap">
     <link rel="stylesheet" href="../../basic_style.css">
+        <style>
+
+        .order-state {
+            font-weight: bold;
+            display: inline-block;
+            width: 80px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+            text-align: center;
+            background-color: #d2e9e4;
+            margin-bottom: 0px;
+            margin-top: 20px;
+        }
+
+        .order-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            clear: both; /* float가 다음 콘텐츠에 영향을 주지 않도록 */
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; 
+            margin: 0 auto; /* My Orders와 동일한 위치로 조정 */
+            gap: 5px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+        }
+
+        .list-box {
+            width: 100%; /* 부모 컨테이너의 너비에 맞춤 */
+            max-width: 1200px; /* 부모와 같은 최대 너비로 제한 */
+            margin: 0 auto;
+            margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        .list-box:hover {
+            transform: scale(1.0);
+            border-color: #ddd;
+        }
+
+
+        .order-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .order-details {
+            flex: 1; /* 이미지 옆 공간을 균일하게 채움 */
+        }
+
+        .list-restaurant {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .order-foods {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .order-price {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
 
 
 </head>
@@ -91,24 +173,30 @@ $conn->close();
         <?php if (count($orders_grouped) > 0): ?>
             <div class="list-container">
                 <?php foreach ($orders_grouped as $order): ?>
+                    <div class="order-state <?php 
+                        echo ($order['state'] === 'cooking') ? 'state-cooking' :
+                             (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
+                        <?php echo htmlspecialchars($order['state']); ?>
+                    </div>
                     <div class="list-box">
-                        <div class="order-state <?php 
-                            echo ($order['state'] === 'cooking') ? 'state-cooking' :
-                                 (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
-                            <?php echo htmlspecialchars($order['state']); ?>
-                        </div>
-                        <div class="list-restaurant">
-                            <?php echo htmlspecialchars($order['name']); ?>
-                        </div>
-                        <div class="order-foods">
-                            <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
-                        </div>
-                        <div class="order-price">
-                            <?php echo htmlspecialchars($order['price']); ?> 원
+                        <div class="order-content">
+                            <img src="../../images/<?php echo htmlspecialchars($order['img']); ?>" alt="<?php echo htmlspecialchars($order['name']); ?>" class="order-img">
+                            <div class="order-details">
+                                <div class="list-restaurant">
+                                    <?php echo htmlspecialchars($order['name']); ?>
+                                </div>
+                                <div class="order-foods">
+                                    <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
+                                </div>
+                                <div class="order-price">
+                                    <?php echo htmlspecialchars($order['price']); ?> 원
+                                </div>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
+
         <?php else: ?>
             <p>No orders found.</p>
         <?php endif; ?>
