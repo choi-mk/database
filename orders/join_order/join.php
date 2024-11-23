@@ -31,13 +31,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// SQL 쿼리 준비 및 실행
-$stmt = $conn->prepare("SELECT delivery_expense FROM restbl WHERE rest_id = ?");
-$stmt->bind_param("i", $restaurant);  
-$stmt->execute();
-$stmt->bind_result($cur_deliver);
-$stmt->fetch();
-$stmt->close();
 
 // ordertbl에 데이터 삽입
 $stmt = $conn->prepare(

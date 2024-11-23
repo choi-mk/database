@@ -21,7 +21,7 @@ if ($conn->connect_error) {
 $phone = $_SESSION['phone'];
 
 // 준비된 쿼리 사용
-$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state, r.img
+$sql = "SELECT j.order_id, m.food, m.price, r.name, o.state, r.img, o.cur_deliver, o.participants_num
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
@@ -49,7 +49,10 @@ while ($row = $result->fetch_assoc()) {
             'foods' => [],
             'price' => 0,
             'state' => $row['state'], 
-            'img' => $row['img']
+            'cur_deliver' => $row['cur_deliver'],
+            'img' => $row['img'],
+            'participants_num' => $row['participants_num'] 
+            
         ];
     }
     $orders_grouped[$order_id]['foods'][] = $row['food'];
@@ -204,6 +207,20 @@ $conn->close();
                                 <div class="order-price">
                                     <?php echo htmlspecialchars($order['price']); ?> 원
                                 </div>
+                                <div class="delivery-fee"> 
+    <?php 
+        $participants_num = $order['participants_num'];
+        $cur_deliver = $order['cur_deliver'];
+
+        // participants_num이 0보다 큰 경우에만 나누기
+        if ($participants_num > 0) {
+            $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
+            echo htmlspecialchars($delivery_fee_per_participant) . " 원";
+        } else {
+            echo "정보 없음";
+        }
+    ?>
+</div>
                             </div>
                         </div>
                     </div>

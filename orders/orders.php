@@ -28,9 +28,21 @@ if ($conn->connect_error) {
 }
 
 // 1. UPDATE 쿼리 실행
+$update_sql_deliveryfee = "WITH RankedOrders AS (
+                            SELECT o.order_id, d.fee,
+                                ROW_NUMBER() OVER (PARTITION BY o.order_id ORDER BY d.fee ASC) AS rn
+                            FROM ordertbl o
+                            JOIN deliveryfee d 
+                            ON d.rest_id = o.restaurant
+                            AND o.current_money >= d.amount
+                        )
+                        UPDATE ordertbl o
+                        JOIN RankedOrders r ON o.order_id = r.order_id
+                        SET o.cur_deliver = r.fee
+                        WHERE r.rn = 1;";
 $update_sql_cooking = "UPDATE ordertbl SET state = 'cooking' WHERE current_money >= goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
 $update_sql_inactive = "UPDATE ordertbl SET state = 'inactive' WHERE current_money < goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
-
+$conn->query($update_sql_deliveryfee);
 $conn->query($update_sql_cooking);
 $conn->query($update_sql_inactive);
 

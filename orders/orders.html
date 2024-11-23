@@ -66,6 +66,8 @@
                         <th>Current Money</th>
                         <th>Restaurant</th>
                         <th>Delivery Address</th>
+                        <th>Participants</th>
+                        <th>Delivery Fee</th>
                         <th>Action</th>
                         
                     </tr>
@@ -80,70 +82,82 @@
 <a href="neworder/neworder_form.php" class="floating-button">+</a>
     <script>
        document.addEventListener("DOMContentLoaded", function () {
-        const nicknameButton = document.getElementById('nickname-button');
-            nicknameButton.addEventListener('click', () => {
-                window.location.href = '../mypage/mypage.php'; // 이동하려는 파일 경로
-            });
-            fetch('orders.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.redirect) {
-                        alert("먼저 로그인을 해주세요");
-                        window.location.href = data.redirect;
-                        return;
-                    }
+    const nicknameButton = document.getElementById('nickname-button');
+    nicknameButton.addEventListener('click', () => {
+        window.location.href = '../mypage/mypage.php'; // 이동하려는 파일 경로
+    });
 
-                    const orderRows = document.getElementById('order-rows');
-                    const userNickname = document.getElementById('user-nickname');
+    fetch('orders.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.redirect) {
+                alert("먼저 로그인을 해주세요");
+                window.location.href = data.redirect;
+                return;
+            }
 
-                    if (data.message) {
-                        orderRows.innerHTML = `<tr><td colspan="6">${data.message}</td></tr>`;
-                    } else {
-                        userNickname.textContent = data.nickname;
-                        data.orders.forEach(order => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${order.order_id}</td>
-                                <td>${order.time}</td>
-                                <td>${order.goal_money}</td>
-                                <td>${order.current_money}</td>
-                                <td>${order.name}</td>
-                                <td>${order.address4}</td>
-                                <td>
-                                    <button class="submit-btn" 
-                                        data-id="${order.order_id}" 
-                                        data-rest-id="${order.restaurant}" 
-                                        data-goal-id="${order.goal_money}" 
-                                        data-cur-id="${order.current_money}" 
-                                        data-time-id="${order.time}">
-                                        Join
-                                    </button>
-                                </td>
-                            `;
-                            orderRows.appendChild(row);
-                        });
+            const orderRows = document.getElementById('order-rows');
+            const userNickname = document.getElementById('user-nickname');
 
-                        // Join 버튼 클릭 이벤트 추가
-                        const joinButtons = document.querySelectorAll(".submit-btn");
-                        joinButtons.forEach(button => {
-                            button.addEventListener("click", function () {
-                                const orderId = this.dataset.id;
-                                const restId = this.dataset.restId;
-                                const goalId = this.dataset.goalId;
-                                const curId = this.dataset.curId;
-                                const timeId = this.dataset.timeId;
+            if (data.message) {
+                orderRows.innerHTML = `<tr><td colspan="8">${data.message}</td></tr>`; // '최소주문금액미만' 표시하는 경우
+            } else {
+                userNickname.textContent = data.nickname;
+                data.orders.forEach(order => {
 
-                                // URL에 식당 ID와 주문 ID 포함
-                                window.location.href = `join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
-                            });
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching orders:', error);
-                    document.getElementById('order-rows').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
+                    const row = document.createElement('tr');
+                    const curDeliver = parseFloat(order.cur_deliver);  // 숫자로 변환
+                    const participants = parseInt(order.participants_num);  // 정수로 변환
+
+                    const curDeliverText = (curDeliver && participants > 0) 
+                        ? Math.floor(curDeliver / participants)  // 소수점 버림
+                        : "최소주문금액미만";
+
+
+                    row.innerHTML = `
+                        <td>${order.order_id}</td>
+                        <td>${order.time}</td>
+                        <td>${order.goal_money}</td>
+                        <td>${order.current_money}</td>
+                        <td>${order.name}</td>
+                        <td>${order.address4}</td>
+                        <td>${order.participants_num}</td>
+                        <td>${curDeliverText}</td>
+                        <td>
+                            <button class="submit-btn" 
+                                data-id="${order.order_id}" 
+                                data-rest-id="${order.restaurant}" 
+                                data-goal-id="${order.goal_money}" 
+                                data-cur-id="${order.current_money}" 
+                                data-time-id="${order.time}">
+                                Join
+                            </button>
+                        </td>
+                    `;
+                    orderRows.appendChild(row);
                 });
+
+                // Join 버튼 클릭 이벤트 추가
+                const joinButtons = document.querySelectorAll(".submit-btn");
+                joinButtons.forEach(button => {
+                    button.addEventListener("click", function () {
+                        const orderId = this.dataset.id;
+                        const restId = this.dataset.restId;
+                        const goalId = this.dataset.goalId;
+                        const curId = this.dataset.curId;
+                        const timeId = this.dataset.timeId;
+
+                        // URL에 식당 ID와 주문 ID 포함
+                        window.location.href = `join_order/join_form.php?order_id=${orderId}&rest_id=${restId}&goal_id=${goalId}&cur_id=${curId}&time_id=${timeId}`;
+                    });
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching orders:', error);
+            document.getElementById('order-rows').innerHTML = '<tr><td colspan="8">Error loading data.</td></tr>';
         });
+});
 
 
 

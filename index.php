@@ -46,7 +46,7 @@ $is_logged_in = isset($_SESSION['phone']);  // 세션에 phone이 저장되어 �
 </nav>
 
 <div class="content">
-    <h2>Content goes here</h2>
+    <h2>What is Moju?</h2>
     <p>This is the home page of the website.</p>
 </div>
 
