@@ -43,6 +43,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../basic_style.css">
     <title>New Order</title>
     <script>
         let menuPrices = {};
@@ -171,11 +172,11 @@ $conn->close();
 
 </head>
 <body>
-<div class="neworder-form">
+<div class="container">
     <h2>New Order</h2>
 
     <form action="neworder.php" method="post">
-        <div class="form-group">
+        <div class="input-group">
             <label for="restaurant"><h3>주문할 식당</h3></label>
             <select id="restaurant" name="restaurant" required onchange="loadMenu()">
                 <option value="">식당을 선택하세요</option>
@@ -199,9 +200,7 @@ $conn->close();
             <label for="goal_money">목표 금액</label>
             <input type="number" id="goal_money" name="goal_money" required>
         </div>
-        <div class="form-group">
-            <input type="submit" value="New Order">
-        </div>
+        <button type="submit" class="submit-btn">New Order</button>
     </form>
 </div>
 </body>

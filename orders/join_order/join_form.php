@@ -39,6 +39,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../basic_style.css">
     <title>Join Order</title>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -85,8 +86,14 @@ $conn->close();
                 const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
                 totalPrice += menuPrices[menuId] * amount;
             }
-            let myPrice = totalPrice-selectedCurId
-            let goalText = selectedGoalId !== null ? `목표 금액: ${selectedGoalId.toLocaleString()} 원` : "목표 금액 없음";
+
+            let myPrice = totalPrice - selectedCurId;
+            let remainingToGoal = selectedGoalId !== null ? Math.max(0, selectedGoalId - totalPrice) : null;
+
+            let goalText = selectedGoalId !== null 
+                ? `목표 금액까지 ${remainingToGoal.toLocaleString()} 원` 
+                : "목표 금액 없음";
+
             document.getElementById('total-price').innerHTML = `
                 지불할 금액: ${myPrice.toLocaleString()} 원 <br>
                 현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
@@ -94,6 +101,7 @@ $conn->close();
             document.getElementById('my-price').value = myPrice;
             document.getElementById('total-price-hidden').value = totalPrice;
         }
+
 
         function filterAmountInputs() {
             const inputs = document.querySelectorAll("input[name^='amount']");
@@ -114,25 +122,9 @@ $conn->close();
             margin: 0;
             background-color: #f4f4f4;
         }
-        .joinorder-container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-        .joinorder-container h2 {
-            margin-bottom: 1rem;
-        }
+
         .input-group {
             margin-bottom: 1rem;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 14px;
         }
         .input-group select,
         .input-group input {
@@ -146,23 +138,23 @@ $conn->close();
         .input-group select {
             background-color: #f9f9f9;
         }
-        .submit-btn {
-            width: 100%;
-            padding: 0.75rem;
-            font-size: 16px;
-            color: #fff;
-            background-color: #333;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background-color: #555;
-        }
-        .error-message {
-            color: red;
-            margin-bottom: 15px;
+
+        #restaurant {
+            font-weight: bold;
+            font-size: 24px;
             text-align: center;
+        }
+
+    /* 메뉴 박스 스타일 */
+        .menu-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
+
         }
 
         .menu-item { 
@@ -188,32 +180,31 @@ $conn->close();
     </style>
 </head>
 <body>
-<div class="joinorder-container">
+<div class="container">
     <h2>Join Order</h2>
 
     <form action="join.php" method="post" onsubmit="filterAmountInputs()">
         <!-- 식당 선택 및 표시 -->
+        <!-- HTML 내 Restaurant Section -->
         <div class="input-group">
-            <label for="restaurant">주문할 식당</label>
             <?php if ($selected_rest_id): ?>
-                <p id="restaurant"><?= htmlspecialchars($restaurant) ?></p>
+                <p id="restaurant"><strong><?= htmlspecialchars($restaurant) ?></strong></p>
                 <input type="hidden" name="rest_id" value="<?= htmlspecialchars($selected_rest_id) ?>">
             <?php endif; ?>
         </div>
 
-
-        <!-- 메뉴 선택 -->
+        <!-- 메뉴 섹션 -->
         <div class="input-group">
-            <label for="menu">주문할 메뉴</label>
-            <div id="menu-container">
+            <div id="menu-container" class="menu-box">
             </div>
         </div>
+
         
         <!-- 현재 금액 -->
         <div class="input-group">
             <div id="total-price" style="margin-top: 10px;">
                 현재 금액: <?= htmlspecialchars($selected_cur_id ?? '0') ?>원
-                (목표 금액 <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>)
+                (목표 금액 까지 <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>원)
             </div>
         </div>
 

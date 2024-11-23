@@ -97,7 +97,7 @@ $conn->close();
                                  (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
                             <?php echo htmlspecialchars($order['state']); ?>
                         </div>
-                        <div class="order-restaurant">
+                        <div class="list-restaurant">
                             <?php echo htmlspecialchars($order['name']); ?>
                         </div>
                         <div class="order-foods">
