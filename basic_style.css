@@ -231,22 +231,28 @@ th {
     margin-bottom: 0.5rem;
     font-size: 14px;
 }
+.input-group span,
 .input-group input {
     width: 100%;
     padding: 0.75rem;
     font-size: 16px;
-    border: 1.5px solid var(--subtitle-color); /* 기본 테두리 색상 */
+    border: 1.5px solid var(--subtitle-color);
     border-radius: 4px;
     box-sizing: border-box;
-    outline: none; /* 기본 outline 제거 */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 부드러운 효과 추가 */
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    display: block; /* 동일한 블록 수준 정렬 */
 }
+
+.input-group span {
+    background-color: #f9f9f9; /* span의 기본 배경색 */
+    color: #333;
+}
+
 .input-group input::placeholder {
     color: var(--title-text-color); /* 연한 회색 */
     font-size: 14px; /* 텍스트 크기 (필요 시 조정) */
 }
-
-
 .input-group input:focus {
     
     border: 2px solid var(--title-color);
