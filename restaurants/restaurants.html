@@ -115,70 +115,73 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('restaurants.php')
-                .then(response => response.json())
-                .then(data => {
-                    const restaurantList = document.getElementById('restaurant-list');
-                    const userNickname = document.getElementById('user-nickname');
+    let allRestaurants = []; // 모든 레스토랑 목록을 저장할 배열
 
-                    if (data.redirect) {
-                        alert("먼저 로그인을 해주세요");
-                        window.location.href = data.redirect;
-                    } else if (data.error) {
-                        restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
-                    } else if (data.message) {
-                        restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
-                    } else {
-                        // 사용자의 닉네임 표시
-                        userNickname.textContent = data.nickname;
-
-                        const allRestaurants = data.restaurants; // JSON에서 받은 레스토랑 데이터
-                        displayRestaurants(allRestaurants); // 초기 레스토랑 목록을 표시
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching restaurant data:', error);
-                    document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
-                });
-
-            // 검색 입력 필터링
-            document.getElementById('search-input').addEventListener('input', function(event) {
-                const searchQuery = event.target.value.toLowerCase();
-                const filteredRestaurants = allRestaurants.filter(restaurant => {
-                    return restaurant.menu.some(item => item.food.toLowerCase().includes(searchQuery));
-                });
-                displayRestaurants(filteredRestaurants);
-            });
-
-            // 레스토랑 목록을 화면에 표시하는 함수
-            function displayRestaurants(restaurants) {
-                const restaurantList = document.getElementById('restaurant-list');
-                restaurantList.innerHTML = ''; // 기존 목록을 초기화
-
-                if (restaurants.length === 0) {
-                    restaurantList.innerHTML = '<div class="error-message">No restaurants found.</div>';
-                } else {
-                    restaurants.forEach(restaurant => {
-                        const box = document.createElement('div');
-                        box.className = 'list-box';
-
-                        box.innerHTML = `
-                            <div class="list-restaurant">
-                                <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
-                                <span class="restaurant-name">${restaurant.name}</span>
-                            </div>
-                        `;
-
-                        // 클릭 이벤트 추가
-                        box.addEventListener('click', () => {
-                            window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
-                        });
-
-                        restaurantList.appendChild(box);
-                    });
-                }
+    fetch('restaurants.php')
+        .then(response => response.json())
+        .then(data => {
+            const restaurantList = document.getElementById('restaurant-list');
+            const userNickname = document.getElementById('user-nickname');
+            if (data.redirect) {
+                alert("먼저 로그인을 해주세요");
+                window.location.href = data.redirect;
+            } else if (data.error) {
+                restaurantList.innerHTML = `<div class="error-message">${data.error}</div>`;
+            } else if (data.message) {
+                restaurantList.innerHTML = `<div class="error-message">${data.message}</div>`;
+            } else {
+                userNickname.textContent = data.nickname;
+                allRestaurants = data.restaurants; // 데이터를 allRestaurants 배열에 저장
+                displayRestaurants(allRestaurants); // 초기 레스토랑 목록을 표시
             }
+        })
+        .catch(error => {
+            console.error('Error fetching restaurant data:', error);
+            document.getElementById('restaurant-list').innerHTML = '<div class="error-message">Error loading data.</div>';
         });
+
+    // 검색 입력 필터링
+    document.getElementById('search-input').addEventListener('input', function(event) {
+        const searchQuery = event.target.value.toLowerCase();
+        const filteredRestaurants = allRestaurants.filter(restaurant => {
+            // 메뉴에 검색어가 포함된 레스토랑만 필터링
+            return restaurant.menu.some(item => item.food.toLowerCase().includes(searchQuery));
+        });
+        displayRestaurants(filteredRestaurants); // 필터링된 레스토랑 목록 표시
+    });
+
+    // 레스토랑 목록을 화면에 표시하는 함수
+    function displayRestaurants(restaurants) {
+        const restaurantList = document.getElementById('restaurant-list');
+        restaurantList.innerHTML = ''; // 기존 목록을 초기화
+
+        if (restaurants.length === 0) {
+            restaurantList.innerHTML = '<div class="error-message">No restaurants found.</div>';
+        } else {
+            restaurants.forEach(restaurant => {
+                const box = document.createElement('div');
+                box.className = 'list-box';
+
+                // 카드에 이미지와 텍스트를 포함
+                box.innerHTML = `
+                    <div class="list-restaurant">
+                        <img src="../images/${restaurant.img}" alt="${restaurant.name}" class="restaurant-img">
+                        <span class="restaurant-name">${restaurant.name}</span>
+                    </div>
+                `;
+
+                // 클릭 이벤트 추가
+                box.addEventListener('click', () => {
+                    window.location.href = `restaurant_detail.php?rest_id=${restaurant.rest_id}`;
+                });
+
+                restaurantList.appendChild(box);
+            });
+        }
+    }
+});
+
+
     </script>
 </body>
 </html>
