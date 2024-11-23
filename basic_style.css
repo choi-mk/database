@@ -162,6 +162,7 @@ h2 {
     text-align: center;
     font-size: 28px;
     font-weight: normal;
+    margin-top: 30px;
 }
 
 
@@ -294,7 +295,7 @@ th {
     flex-wrap: wrap;
     gap: 20px;
     margin: 40px 20px 20px 20px; /* 위쪽 여백을 40px로 설정 */
-    background-color: #f4f4f4;
+    background-color: #f7f7f7;
     justify-content: center; /* 수평 중앙 정렬 */
     align-items: center; /* 수직 중앙 정렬 */
     padding-top: 20px; /* 내부 위쪽 여백 */
@@ -347,18 +348,21 @@ th {
 .list-restaurant {
     font-weight: bold;
     margin-bottom: 6px;
-    font-size: 20px;
-    margin-left: 8px;
+    font-size: 24px;
+    margin-left: 14px;
+    
 }
 
 .order-foods {
+    margin-top: 10px;
     margin-bottom: 8px;
-    margin-left: 8px;
+    margin-left: 14px;
 }
 
 .order-price {
+    
     margin-bottom: 8px;
-    margin-left: 8px;
+    margin-left: 14px;
 }
 
 .header-container {

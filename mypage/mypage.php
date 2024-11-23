@@ -96,11 +96,16 @@ $conn->close();
         <a href="../index.php" class="header-link">
             <h1>MoJu</h1>
         </a>
-        <div class="nickname-block"> <span id="user-nickname"></span> 님</div>
+            <div class="nickname-block">
+                <button id="nickname-button" class="nickname-button" 
+                    onclick="window.location.href='mypage.php'">
+                    <?php echo htmlspecialchars($_SESSION['nickname']); ?> 님
+                </button>
+            </div>
     </header>
 
     <nav>
-        <a href="restaurants.html" class="current-button">Restaurants</a>
+        <a href="../restaurants/restaurants.html" class="current-button">Restaurants</a>
         <a href="../orders/orders.html" class="orders-button">Orders</a>
         <a href="../signin/logout.php" class="logout-button">Logout</a>
     </nav>

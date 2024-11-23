@@ -73,14 +73,15 @@ $conn->close();
         .order-state {
             font-weight: bold;
             display: inline-block;
-            width: 80px;
-            padding: 5px 10px;
+            width: 40px;
+            
             border-radius: 3px;
             font-size: 14px;
-            text-align: center;
-            background-color: #d2e9e4;
+            text-align: left;
+            background-color: #f7f7f7;
             margin-bottom: 0px;
             margin-top: 20px;
+            
         }
 
         .order-content {
@@ -97,7 +98,7 @@ $conn->close();
             margin: 0 auto; /* My Orders와 동일한 위치로 조정 */
             gap: 5px;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f7f7f7;
             border-radius: 10px;
         }
 
