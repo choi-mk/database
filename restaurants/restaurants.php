@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
- 
+
 // login 확인
 session_start();
 
@@ -35,6 +35,7 @@ if ($userAddress) {
     $address2 = $userAddress['address2'];
     $address3 = $userAddress['address3'];
 
+    // 레스토랑 정보 가져오기
     $sql = "SELECT rest_id, name, address1, address2, address3, img FROM restbl WHERE address1 = ? AND address2 = ? AND address3 = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sss", $address1, $address2, $address3);
@@ -43,6 +44,22 @@ if ($userAddress) {
 
     $restaurants = [];
     while ($row = $result->fetch_assoc()) {
+        // 각 레스토랑의 메뉴 가져오기
+        $rest_id = $row['rest_id'];
+        $sql_menu = "SELECT food, price FROM menutbl WHERE rest_id = ?";
+        $stmt_menu = $conn->prepare($sql_menu);
+        $stmt_menu->bind_param("i", $rest_id);
+        $stmt_menu->execute();
+        $menu_result = $stmt_menu->get_result();
+
+        $menu = [];
+        while ($menu_item = $menu_result->fetch_assoc()) {
+            $menu[] = $menu_item;
+        }
+
+        // 메뉴를 레스토랑 정보에 추가
+        $row['menu'] = $menu;
+
         $restaurants[] = $row;
     }
 

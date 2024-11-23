@@ -14,11 +14,17 @@
             max-width: 1000px;
         }
 
+        /* header-container 스타일 수정 */
         .header-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            align-items: center; /* 세로 중앙 정렬 */
+            justify-content: flex-start; /* 검색바를 왼쪽으로 정렬 */
             margin-bottom: 20px;
+        }
+
+        /* 검색바 스타일 */
+        .search-bar {
+            margin-right: 20px; /* 검색바와 다른 요소 간의 간격 */
         }
 
         .search-bar input {
@@ -98,9 +104,10 @@
     <main>
         <div class="header-container">
             <h2>Available Restaurants</h2>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search restaurants...">
-            </div>
+            
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search restaurants...">
         </div>
         <div id="restaurant-list" class="list-container">
             <!-- JavaScript로 레스토랑 목록이 여기에 추가됩니다 -->
@@ -136,9 +143,10 @@
     // 검색 입력 필터링
     document.getElementById('search-input').addEventListener('input', function(event) {
         const searchQuery = event.target.value.toLowerCase();
-        const filteredRestaurants = allRestaurants.filter(restaurant => 
-            restaurant.name.toLowerCase().includes(searchQuery)
-        );
+        const filteredRestaurants = allRestaurants.filter(restaurant => {
+            // 메뉴에 검색어가 포함된 레스토랑만 필터링
+            return restaurant.menu.some(item => item.food.toLowerCase().includes(searchQuery));
+        });
         displayRestaurants(filteredRestaurants); // 필터링된 레스토랑 목록 표시
     });
 
@@ -172,6 +180,7 @@
         }
     }
 });
+
 
 
 
