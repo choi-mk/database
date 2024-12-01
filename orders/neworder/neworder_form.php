@@ -39,7 +39,7 @@ if ($rest_id) {
 
 // 식당 목록 가져오기
 $stmt = $conn->prepare(
-    "SELECT r.rest_id, r.name 
+    "SELECT r.rest_id, r.name, r.minprice
     FROM restbl r
     JOIN deliverable d ON r.rest_id = d.rest_id
     WHERE d.phone = ?");
@@ -238,9 +238,12 @@ $conn->close();
             <label for="time"><br>Order Closing Time</label>
             <input type="datetime-local" id="time" name="time" required>
         </div>
+        <?php $minprice = $restaurant['minprice']; ?>
+
         <div class="form-group">
             <label for="goal_money">Goal Money</label>
-            <input type="number" id="goal_money" name="goal_money" required>
+            <input type="number" id="goal_money" name="goal_money" required min="<?= htmlspecialchars($minprice) ?>" 
+                placeholder="Enter goal money (min: <?= htmlspecialchars($minprice) ?>)">
         </div>
         <div class="form-group">
             <label for="goal_money">Delivery Address</label>

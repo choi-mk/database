@@ -20,12 +20,46 @@ if ($conn->connect_error) {
 
 $phone = $_SESSION['phone'];
 
+// 1. UPDATE 쿼리 실행
+$update_sql_deliveryfee = "
+WITH RankedOrders AS (
+    SELECT o.order_id, d.fee,
+        ROW_NUMBER() OVER (PARTITION BY o.order_id ORDER BY d.fee ASC) AS rn
+    FROM ordertbl o
+    JOIN deliveryfee d 
+        ON d.rest_id = o.restaurant
+        AND o.current_money >= d.amount
+)
+UPDATE ordertbl o
+LEFT JOIN restbl r ON o.restaurant = r.rest_id
+LEFT JOIN RankedOrders rnk ON o.order_id = rnk.order_id AND rnk.rn = 1
+SET o.cur_deliver = 
+    CASE 
+        WHEN o.current_money < r.minprice THEN NULL
+        ELSE rnk.fee
+    END;
+";
+
+$update_sql_cooking = "UPDATE ordertbl SET state = 'cooking' WHERE current_money >= goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
+$update_sql_inactive = "UPDATE ordertbl SET state = 'inactive' WHERE current_money < goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
+$conn->query($update_sql_deliveryfee);
+$conn->query($update_sql_cooking);
+$conn->query($update_sql_inactive);
+
+
+
 // 준비된 쿼리 사용
-$sql = "SELECT j.order_id, j.amount, m.food, m.price, r.name, o.state, r.img, o.cur_deliver, o.participants_num
+$sql = "SELECT j.order_id, j.amount, m.food, m.price, r.name, o.state, r.img, 
+               o.cur_deliver, o.participants_num, df.max_fee AS delivery_fee
         FROM jointbl j
         JOIN menutbl m ON j.menu = m.menu_id
         JOIN restbl r ON m.rest_id = r.rest_id
         JOIN ordertbl o ON o.order_id = j.order_id
+        LEFT JOIN (
+            SELECT rest_id, MAX(fee) AS max_fee
+            FROM deliveryfee
+            GROUP BY rest_id
+        ) df ON r.rest_id = df.rest_id
         WHERE j.mem_id = ?
         ORDER BY 
             FIELD(o.state, 'cooking', 'active', 'inactive'), 
@@ -52,8 +86,8 @@ while ($row = $result->fetch_assoc()) {
             'cur_deliver' => $row['cur_deliver'],
             'img' => $row['img'],
             'participants_num' => $row['participants_num'],
-            'amount' => $row['amount'] 
-            
+            'amount' => $row['amount'], 
+            'delivery_fee' => $row['delivery_fee'] // 최대 배달비 추가
         ];
     }
     if ($row['amount'] > 0) {
@@ -61,6 +95,7 @@ while ($row = $result->fetch_assoc()) {
         $orders_grouped[$order_id]['price'] += $row['price'] * $row['amount'];
     }
 }
+
 
 // 연결 종료
 $conn->close();
@@ -120,6 +155,8 @@ $conn->close();
             padding: 15px;
             box-sizing: border-box;
             background-color: #ffffff;
+            flex-direction: column; /* 주문 내용이 세로로 나열되도록 */
+            gap: 10px; /* 각 항목 간의 간격 */
         }
 
         .list-box:hover {
@@ -249,74 +286,90 @@ $conn->close();
 
         <?php if (count($orders_grouped) > 0): ?>
             <div class="list-container">
-                <?php foreach ($orders_grouped as $order): ?>
-                    <div class="order-state <?php 
-                        echo ($order['state'] === 'cooking') ? 'state-cooking' :
-                             (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
-                        <?php echo htmlspecialchars($order['state']); ?>
-                    </div>
-                    <div class="list-box">
-    <div class="order-content">
-        <!-- 왼쪽: 이미지 -->
-        <div class="order-left">
-            <img src="../../images/<?php echo htmlspecialchars($order['img']); ?>" alt="<?php echo htmlspecialchars($order['name']); ?>" class="order-img">
-        </div>
+            <?php foreach ($orders_grouped as $order): ?>
+                <div class="order-state <?php echo ($order['state'] === 'cooking') ? 'state-cooking' : (($order['state'] === 'active') ? 'state-active' : 'state-inactive'); ?>">
+                    <?php echo htmlspecialchars($order['state']); ?>
+                </div>
+                <div class="list-box">
+                    <div class="order-content">
+                        <!-- 왼쪽: 이미지 -->
+                        <div class="order-left">
+                            <img src="../../images/<?php echo htmlspecialchars($order['img']); ?>" alt="<?php echo htmlspecialchars($order['name']); ?>" class="order-img">
+                        </div>
 
-        <!-- 중앙: ORDER DETAIL -->
-        <div class="order-middle">
-            <div class="list-restaurant">
-                <?php echo htmlspecialchars($order['name']); ?>
-            </div>
-            <div class="order-foods">
-                <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
-            </div>
-            <div class="order-price">
-                <?php echo htmlspecialchars($order['price']); ?> 원
-            </div>
-        </div>
+                        <!-- 중앙: ORDER DETAIL -->
+                        <div class="order-middle">
+                            <div class="list-restaurant">
+                                <?php echo htmlspecialchars($order['name']); ?>
+                            </div>
+                            <div class="order-foods">
+                                <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
+                            </div>
+                            <div class="order-price">
+                                <?php echo htmlspecialchars($order['price']); ?> 원
+                            </div>
+                        </div>
 
-        <!-- 오른쪽: 배달비 및 EDIT 버튼 -->
-        <div class="order-right">
-        <div class="edit-button-container">
-                <button 
-                    class="submit-btn" 
-                    onclick="window.location.href='../edit_order/edit_order.php?order_id=<?php echo htmlspecialchars($order['order_id']); ?>&price=<?php echo htmlspecialchars($order['price']); ?>'">
-                    Edit
-                </button>
-            </div>
-            <div class="delivery-fee">
-                <span class="delivery-label">지불한 배달비:</span>
-                <?php echo htmlspecialchars($order['cur_deliver']); ?> 원
-            </div>
-            <div class="curdelivery-fee">
-                <span class="delivery-label">현재 배달비:</span>
-                <?php 
-                    $participants_num = $order['participants_num'];
-                    $cur_deliver = $order['cur_deliver'];
+                        <!-- 오른쪽: 배달비 및 EDIT 버튼 -->
+                        <div class="order-right">
+                            <div class="edit-button-container">
+                                <button class="submit-btn" <?php echo ($order['state'] !== 'active') ? 'disabled' : ''; ?> 
+                                onclick="window.location.href='../edit_order/edit_order.php?order_id=<?php echo htmlspecialchars($order['order_id']); ?>&price=<?php echo htmlspecialchars($order['price']); ?>'">
+                                    Edit
+                                </button>
+                            </div>
 
-                    if ($participants_num > 0) {
-                        $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
-                        echo htmlspecialchars($delivery_fee_per_participant) . " 원";
-                    } else {
-                        echo "정보 없음";
-                    }
-                ?>
-            </div>
-            <div class="delivery-fee">
-                <span class="delivery-label">환불 배달비:</span>
-                <?php echo htmlspecialchars($order['cur_deliver']); ?> 원
-            </div>
-            
-        </div>
-    </div>
-</div>
+                            <div class="delivery-fee">
+                                <span class="delivery-label">지불한 배달비:</span>
+                                <?php echo htmlspecialchars($order['delivery_fee']); ?> 원
+                            </div>
 
+                        
+                            <div class="curdelivery-fee">
+                                <span class="delivery-label">현재 배달비:</span>
+                                <?php if (is_null($order['cur_deliver'])): ?>
+                                    <span>최소 주문 금액 미만</span>
+                                <?php else: ?>
+                                    <?php 
+                                        if ($order['participants_num'] > 0) {
+                                            $delivery_fee_per_participant = floor($order['cur_deliver'] / $order['participants_num']);
+                                            echo htmlspecialchars($delivery_fee_per_participant) . " 원";
+                                        } else {
+                                            echo "정보 없음";
+                                        }
+                                    ?>
+                                <?php endif; ?>
+                            </div>
 
+                            <div class="delivery-fee">
+                                <span class="delivery-label">환불 배달비:</span>
+                                <?php 
+                                    if (is_null($order['cur_deliver'])) {
+                                        // cur_deliver가 null일 경우, delivery_fee 그대로 출력
+                                        echo htmlspecialchars($order['delivery_fee']) . " 원";
+                                    } else {
+                                        if ($order['participants_num'] > 0) {
+                                            $refund_fee = $order['delivery_fee'] - $delivery_fee_per_participant;
+                                            if ($refund_fee > 0) {
+                                                echo htmlspecialchars($refund_fee) . " 원";
+                                            } else {
+                                                echo "환불 없음";
+                                            }
+                                        } else {
+                                            echo "정보 없음";
+                                        }
+                                    }
+                                ?>
+                            </div>
+
+                        
 
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
 
         <?php else: ?>
             <p>No orders found.</p>

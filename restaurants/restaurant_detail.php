@@ -14,6 +14,35 @@ if ($conn->connect_error) {
     exit;
 }
 
+// 1. UPDATE 쿼리 실행
+$update_sql_deliveryfee = "
+WITH RankedOrders AS (
+    SELECT o.order_id, d.fee,
+        ROW_NUMBER() OVER (PARTITION BY o.order_id ORDER BY d.fee ASC) AS rn
+    FROM ordertbl o
+    JOIN deliveryfee d 
+        ON d.rest_id = o.restaurant
+        AND o.current_money >= d.amount
+)
+UPDATE ordertbl o
+LEFT JOIN restbl r ON o.restaurant = r.rest_id
+LEFT JOIN RankedOrders rnk ON o.order_id = rnk.order_id AND rnk.rn = 1
+SET o.cur_deliver = 
+    CASE 
+        WHEN o.current_money < r.minprice THEN NULL
+        ELSE rnk.fee
+    END;
+";
+$update_sql_cooking = "UPDATE ordertbl SET state = 'cooking' WHERE current_money >= goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
+$update_sql_inactive = "UPDATE ordertbl SET state = 'inactive' WHERE current_money < goal_money AND DATE_ADD(NOW(), INTERVAL 9 HOUR) >= time";
+$conn->query($update_sql_deliveryfee);
+$conn->query($update_sql_cooking);
+$conn->query($update_sql_inactive);
+
+
+
+
+
 $sql = "SELECT r.name, r.rest_id, m.food, m.price, m.img, r.minprice FROM restbl r JOIN menutbl m ON r.rest_id = m.rest_id WHERE r.rest_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $rest_id);
@@ -84,31 +113,32 @@ $conn->close();
     <link rel="stylesheet" href="../basic_style.css">
     <style>
         .split-container {
-            display: flex; /* Flexbox를 사용하여 좌우 정렬 */
-            justify-content: space-between; /* 좌우로 요소를 정렬 */
-            gap: 20px; /* 좌우 패널 사이의 간격 */
-            padding: 20px; /* 컨테이너 내부 여백 */
-            max-width: 1200px; /* 컨테이너의 최대 너비 설정 */
-            margin: 0 auto; /* 가운데 정렬 */
-            box-sizing: border-box;
-        }
+    display: flex; /* Flexbox 사용 */
+    gap: 20px; /* 패널 간격 */
+    padding: 20px; /* 컨테이너 내부 여백 */
+    max-width: 1200px; /* 최대 너비 */
+    margin: 0 auto; /* 가운데 정렬 */
+    box-sizing: border-box;
+}
 
-        .left-pane, .right-pane {
-            flex: 1; /* 좌우 패널이 동일한 크기를 가짐 */
-            min-width: 300px; /* 패널의 최소 너비 */
-            background-color: #f9f9f9; /* 패널의 배경색 */
-            padding: 20px; /* 패널 내부 여백 */
-            border-radius: 8px; /* 모서리 둥글게 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 추가 */
-        }
+.left-pane {
+    flex: 4; /* 비율 3 */
+    min-width: 200px; /* 최소 너비 */
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .left-pane {
-            /* 추가 스타일이 필요하면 여기에 작성 */
-        }
+.right-pane {
+    flex: 6; /* 비율 7 */
+    min-width: 400px; /* 최소 너비 */
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-        .right-pane {
-            /* 추가 스타일이 필요하면 여기에 작성 */
-        }
 
         .search-bar {
             margin-bottom: 20px; /* 검색창과 메뉴 리스트 사이의 간격 */
@@ -244,9 +274,26 @@ $conn->close();
                 <!-- 최소주문금액 r.minprice, amount별 배달 fee 표시-->
             </div>
             <h2>Current Order</h2>
-            <div id="order-list" class="order-container">
-                <!-- JavaScript로 현재 주문 내용이 여기에 추가됩니다 -->
+            
+            <div id="order-list" >
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order Time</th>
+                            <th>Goal Money</th>
+                            <th>Current Money</th>
+                            <th>Delivery Fee</th>
+                            <th>Delivery Address</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-rows">
+                        <!-- JavaScript로 주문 내용이 여기에 추가됩니다 -->
+                    </tbody>
+                </table>
             </div>
+
+            
         </div>
     </main>
 
@@ -372,19 +419,32 @@ $conn->close();
         
             // 주문 렌더링 함수
             function renderCurrentOrder(orders) {
+                const orderList = document.getElementById('order-rows'); // tbody
                 orderList.innerHTML = ''; // 초기화
                 if (!orders || orders.length === 0) {
                     orderList.innerHTML = '<div class="error-message">No items in the current order.</div>';
                     return;
                 }
+                
+            
             
                 orders.forEach(item => {
                     const row = document.createElement('tr');
+                    let curDeliverText = '';
+                    const curDeliver = parseFloat(item.cur_deliver);  // 숫자로 변환
+                    const participantsNum = parseInt(item.participants_num);  // 정수로 변환
+                    
+                    if (isNaN(curDeliver) || isNaN(participantsNum) || participantsNum <= 0) {
+                        curDeliverText = '최소주문금액미만'; // 최소 주문 금액 미만인 경우
+                    } else {
+                        const deliveryFeePerParticipant = Math.floor(curDeliver / participantsNum);  // 소수점 버림
+                        curDeliverText = `${deliveryFeePerParticipant}`;
+                    }
                     row.innerHTML = `
-                        <td>${item.order_id}</td>
                         <td>${item.time}</td>
                         <td>${item.goal_money}</td>
                         <td>${item.current_money}</td>
+                        <td>${curDeliverText}</td>
                         <td>${item.address4}</td>
                         <td>
                             <button class="submit-btn" 
