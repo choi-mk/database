@@ -45,6 +45,7 @@ $conn->close();
         document.addEventListener("DOMContentLoaded", function () {
             // 페이지가 로드되면 메뉴를 자동으로 로드
             loadMenu();
+            updateTotalPrice();  // 초기 총 금액 업데이트
         });
         let selectedCurId = <?= htmlspecialchars($selected_cur_id ?? '0') ?>;
         let selectedGoalId = <?= htmlspecialchars($selected_goal_id ?? 'null') ?>;
@@ -104,14 +105,7 @@ $conn->close();
         }
 
 
-        function filterAmountInputs() {
-            const inputs = document.querySelectorAll("input[name^='amount']");
-            inputs.forEach(input => {
-                if (parseInt(input.value) === 0) {
-                    input.remove();
-                }
-            });
-        }
+
     </script>
     <style>
         body {
@@ -192,7 +186,7 @@ $conn->close();
 <div class="container">
     <h2>Join Order</h2>
 
-    <form action="join.php" method="post" onsubmit="filterAmountInputs()">
+    <form action="join.php" method="post" >
         <!-- 식당 선택 및 표시 -->
         <!-- HTML 내 Restaurant Section -->
         <div class="input-group">

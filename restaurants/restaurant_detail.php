@@ -36,10 +36,20 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-$sql = "SELECT o.* FROM ordertbl o
-        WHERE  o.restaurant = ? and o.state = 'active';";
+$sql = "
+    SELECT o.*, r.name, r.img
+    FROM jointbl j
+    JOIN ordertbl o ON j.order_id = o.order_id
+    JOIN restbl r ON o.restaurant = r.rest_id
+    JOIN deliverable d ON r.rest_id = d.rest_id 
+    WHERE j.mem_id != ? and o.state = 'active' AND d.phone = ? AND o.restaurant = ?
+    AND o.order_id NOT IN (SELECT DISTINCT order_id FROM jointbl WHERE mem_id = ?)
+    GROUP BY o.order_id
+    ORDER BY o.order_id ASC;
+";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $rest_id);
+$stmt->bind_param("ssis", $phone, $phone, $rest_id, $phone);
+
 $stmt->execute();
 $result = $stmt->get_result();
 

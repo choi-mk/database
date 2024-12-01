@@ -16,12 +16,14 @@ $phone = $_SESSION['phone'];
 
 if (isset($_GET['rest_id']) && isset($_GET['order_id'])) {
     $rest_id = intval($_GET['rest_id']);
+    $order_id = intval($_GET['order_id']);
+
     $menu_stmt = $conn->prepare("select j.amount, m.*
                                 from menutbl m
                                 join jointbl j on j.menu = m.menu_id
-                                where rest_id = ? and j.mem_id = ? and order_id");
+                                where rest_id = ? and j.mem_id = ? and order_id = ?");
     
-    $menu_stmt->bind_param("is", $rest_id, $phone);
+    $menu_stmt->bind_param("isi", $rest_id, $phone, $order_id);
     $menu_stmt->execute();
     $menu_result = $menu_stmt->get_result();
     $menus = [];

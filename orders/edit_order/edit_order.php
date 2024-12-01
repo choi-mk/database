@@ -1,7 +1,7 @@
 <?php
 session_start();
-$order_id =  isset($_GET['order_id']) ? htmlspecialchars($_GET['order_id']) : null;
-
+$order_id = isset($_GET['order_id']) ? htmlspecialchars($_GET['order_id']) : null;
+$my_price = isset($_GET['price']) ? htmlspecialchars($_GET['price']) : 0;  // 기본값 0으로 설정
 
 // DB 연결 정보
 $servername = "termproject.c3qoysmqqna6.ap-northeast-2.rds.amazonaws.com";
@@ -45,84 +45,132 @@ $conn->close();
     <title>Edit Order</title>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // 페이지가 로드되면 메뉴를 자동으로 로드
-            loadMenu();
-        });
+    // 페이지가 로드되면 메뉴를 자동으로 로드하고, my_price 표시
+    loadMenu();
+      // 초기 총 금액 업데이트
+});
 
-        let menuPrices = {};
+let menuPrices = {};
+let initialPrice = <?php echo htmlspecialchars($my_price ?? 0); ?>;  // 초기값 my_price
+let currentMoney = <?php echo isset($row['current_money']) ? htmlspecialchars($row['current_money']) : 'null'; ?>;
 
-        function loadMenu() {
-            const restId = "<?php echo $row['restaurant']; ?>"; 
-            const menuContainer = document.getElementById('menu-container');
-            menuContainer.innerHTML = '';
+let goalMoney = <?php echo isset($row['goal_money']) ? htmlspecialchars($row['goal_money']) : 'null'; ?>;
 
-            if (restId) {
-                fetch(`menu_loader.php?rest_id=${restId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(menu => {
-                            menuPrices[menu.menu_id] = menu.price;
+function loadMenu() {
+    const restId = "<?php echo $row['restaurant']; ?>"; 
+    const orderId = "<?php echo $row['order_id']; ?>"; 
+    const menuContainer = document.getElementById('menu-container');
+    menuContainer.innerHTML = '';
 
-                            // amount를 동적으로 가져와 기본값으로 설정
-                            const amount = menu.amount || 0;
+    if (restId) {
+        fetch(`menu_loader.php?rest_id=${restId}&order_id=${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(menu => {
+                    menuPrices[menu.menu_id] = menu.price;
 
-                            const menuItem = document.createElement('div');
-                            menuItem.className = 'menu-item';
-                            menuItem.innerHTML = `
-                                <img src="../../images/${menu.img}" alt="${menu.food}" class="menu-img">
-                                <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
-                                <input type="number" id="amount-${menu.menu_id}" 
-                                    name="amount[${menu.menu_id}]" 
-                                    value="${amount}" 
-                                    min="0" 
-                                    oninput="updateTotalPrice()">
-                            `;
-                            menuContainer.appendChild(menuItem);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading menu:', error);
-                        menuContainer.innerHTML = `<p>메뉴를 불러오는 데 실패했습니다. 에러 메시지: ${error.message}</p>`;
-                    });
-            } else {
-                menuContainer.innerHTML = '<p>식당 ID가 없습니다.</p>';
-            }
-        }
+                    // amount를 동적으로 가져와 기본값으로 설정
+                    const amount = menu.amount || 0;
 
-
-        function updateTotalPrice() {
-            let totalPrice = selectedCurId;
-            for (const menuId in menuPrices) {
-                const amount = parseInt(document.getElementById(`amount-${menuId}`)?.value || 0);
-                totalPrice += menuPrices[menuId] * amount;
-            }
-
-            let myPrice = totalPrice - selectedCurId;
-            let remainingToGoal = selectedGoalId !== null ? Math.max(0, selectedGoalId - totalPrice) : null;
-
-            let goalText = selectedGoalId !== null 
-                ? `목표 금액까지 ${remainingToGoal.toLocaleString()} 원` 
-                : "목표 금액 없음";
-
-            document.getElementById('total-price').innerHTML = `
-                지불할 금액: ${myPrice.toLocaleString()} 원 <br>
-                현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
-            `;
-            document.getElementById('my-price').value = myPrice;
-            document.getElementById('total-price-hidden').value = totalPrice;
-        }
-
-
-        function filterAmountInputs() {
-            const inputs = document.querySelectorAll("input[name^='amount']");
-            inputs.forEach(input => {
-                if (parseInt(input.value) === 0) {
-                    input.remove();
-                }
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+                    menuItem.innerHTML = `
+                        <img src="../../images/${menu.img}" alt="${menu.food}" class="menu-img">
+                        <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
+                        <input type="number" id="amount-${menu.menu_id}" 
+                            name="amount[${menu.menu_id}]" 
+                            value="${amount}" 
+                            min="0" 
+                            oninput="updateTotalPrice()">`;  // 실시간 갱신
+                    menuContainer.appendChild(menuItem);
+                });
+                updateTotalPrice();
+            })
+            .catch(error => {
+                console.error('Error loading menu:', error);
+                menuContainer.innerHTML = `<p>메뉴를 불러오는 데 실패했습니다. 에러 메시지: ${error.message}</p>`;
             });
-        }
+    } else {
+        menuContainer.innerHTML = '<p>식당 ID가 없습니다.</p>';
+    }
+}
+
+function loadMenu() {
+    const restId = "<?php echo $row['restaurant']; ?>"; 
+    const orderId = "<?php echo $row['order_id']; ?>"; 
+    const menuContainer = document.getElementById('menu-container');
+    menuContainer.innerHTML = '';
+
+    if (restId) {
+        fetch(`menu_loader.php?rest_id=${restId}&order_id=${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(menu => {
+                    menuPrices[menu.menu_id] = menu.price;
+
+                    // amount를 동적으로 가져와 기본값으로 설정
+                    const amount = menu.amount || 0;
+
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item';
+                    menuItem.innerHTML = `
+                        <img src="../../images/${menu.img}" alt="${menu.food}" class="menu-img">
+                        <label>${menu.food} (${menu.price.toLocaleString()} 원)</label>
+                        <input type="number" id="amount-${menu.menu_id}" 
+                            name="amount[${menu.menu_id}]" 
+                            value="${amount}" 
+                            min="0" 
+                            oninput="updateTotalPrice()">`;  // 실시간 갱신
+                    menuContainer.appendChild(menuItem);
+                });
+                updateTotalPrice(); // 메뉴 로드 후 최초 총 금액 계산
+            })
+            .catch(error => {
+                console.error('Error loading menu:', error);
+                menuContainer.innerHTML = `<p>메뉴를 불러오는 데 실패했습니다. 에러 메시지: ${error.message}</p>`;
+            });
+    } else {
+        menuContainer.innerHTML = '<p>식당 ID가 없습니다.</p>';
+    }
+}
+
+function updateTotalPrice() {
+    let myPrice = 0;
+    let totalPrice = currentMoney - initialPrice;
+
+    // 각 메뉴 항목에 대해 가격과 수량을 계산
+    for (const menuId in menuPrices) {
+        const amount = parseInt(document.getElementById(`amount-${menuId}`).value || 0);
+        myPrice += menuPrices[menuId] * amount;  // 메뉴 가격 * 수량
+    }
+
+    // 총 금액을 계산할 때 initialPrice를 수정하지 않음
+    totalPrice += myPrice;
+
+    // 목표 금액에 따른 남은 금액 계산
+    let remainingToGoal = goalMoney !== null ? Math.max(0, goalMoney - totalPrice) : null;
+
+    // 목표 금액 정보 표시
+    let goalText = goalMoney !== null
+        ? `목표 금액까지 ${remainingToGoal.toLocaleString()} 원`
+        : "목표 금액 없음";
+
+    // UI 업데이트
+    document.getElementById('total-price').innerHTML = `
+        지불할 금액: ${myPrice.toLocaleString()} 원 <br>
+        현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
+    `;
+
+    // 숨겨진 input 값 업데이트
+    document.getElementById('my-price').value = myPrice;
+    document.getElementById('total-price-hidden').value = totalPrice;
+}
+
+
+
     </script>
     <style>
+        /* 기존 스타일 그대로 유지 */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -155,7 +203,7 @@ $conn->close();
             text-align: center;
         }
 
-    /* 메뉴 박스 스타일 */
+        /* 메뉴 박스 스타일 */
         .menu-box {
             display: flex;
             flex-direction: column;
@@ -164,7 +212,6 @@ $conn->close();
             border-radius: 8px;
             padding: 15px;
             background-color: #fff;
-
         }
 
         .menu-item { 
@@ -201,38 +248,32 @@ $conn->close();
 <div class="container">
     <h2>Edit Order</h2>
 
-    <form action="edit.php" method="post" onsubmit="filterAmountInputs()">
+    <form action="edit.php" method="post">
         <!-- 식당 선택 및 표시 -->
-        <!-- HTML 내 Restaurant Section -->
         <div class="input-group">
-            <!-- 항상 레스토랑 이름 표시 -->
             <p id="restaurant"><strong><?= htmlspecialchars($row['name']) ?></strong></p>
-            <!-- 항상 hidden input으로 rest_id 포함 -->
+            <input type="hidden" id="restaurant-id" name="rest_id" value="<?= htmlspecialchars($row['restaurant']) ?>"> 
         </div>
-
 
         <!-- 메뉴 섹션 -->
-        <div class="input-group">
-            <div id="menu-container" class="menu-box">
-            </div>
-        </div>
+        <div id="menu-container" class="menu-box"></div>
 
-        
         <!-- 현재 금액 -->
         <div class="input-group">
             <div id="total-price" style="margin-top: 10px;">
-                현재 금액: <?= htmlspecialchars($selected_cur_id ?? '0') ?>원
-                (목표 금액  <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>원)
+                현재 금액: <?= htmlspecialchars($row['current_money'] ?? '0') ?>원
+                (목표 금액  <?= htmlspecialchars($row['goal_money']) ? htmlspecialchars($row['goal_money']) : "목표 금액 없음" ?>원)
             </div>
         </div>
+
+
 
         <input type="hidden" id="total-price-hidden" name="total_price" value="0"> <!-- totalPrice 값 -->
         <input type="hidden" id="my-price" name="my_price" value="0"> <!-- myPrice 값 -->
         <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id) ?>"> <!-- order_id 값 -->
 
-        <!-- 제출 버튼 -->
-        <div class= "input-group" >
-            <button type="join" class="submit-btn">Edit Order</button>
+        <div class="input-group">
+            <button type="submit" class="submit-btn">Edit Order</button>
         </div>
     </form>
 </div>

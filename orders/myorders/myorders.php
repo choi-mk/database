@@ -155,6 +155,64 @@ $conn->close();
             font-weight: bold;
             color: #333;
         }
+        .order-content {
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬로 변경 */
+    align-items: center; /* 수직 정렬 */
+    gap: 10px; /* 이미지와 ORDER DETAIL 사이 간격 */
+}
+
+.order-left {
+    flex: 0; /* 너비를 고정 */
+    margin-right: 10px; /* 이미지와 ORDER DETAIL 간격 */
+}
+
+.order-middle {
+    flex: 1; /* ORDER DETAIL 공간을 더 작게 */
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* ORDER DETAIL 내부 요소 간 간격 */
+    margin-left: 5px; /* 추가 여백으로 이미지와 밀착 방지 */
+}
+
+.order-img {
+    width: 100px; /* 이미지 크기 */
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+
+.order-right {
+    flex: 1; /* 배달비 및 EDIT 버튼 부분 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 오른쪽 정렬 */
+    gap: 10px;
+}
+
+
+.delivery-fee, .curdelivery-fee {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    text-align: right;
+}
+
+.edit-button-container .submit-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #B3C8CF;
+    color: #566164;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button-container .submit-btn:hover {
+    background-color: #89A8B2;
+
+}
     </style>
 
 
@@ -198,38 +256,63 @@ $conn->close();
                         <?php echo htmlspecialchars($order['state']); ?>
                     </div>
                     <div class="list-box">
-                        <div class="order-content">
-                            <img src="../../images/<?php echo htmlspecialchars($order['img']); ?>" alt="<?php echo htmlspecialchars($order['name']); ?>" class="order-img">
-                            <div class="order-details">
-                                <div class="list-restaurant">
-                                    <?php echo htmlspecialchars($order['name']); ?>
-                                </div>
-                                <div class="order-foods">
-                                    <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
-                                </div>
-                                <div class="order-price">
-                                    <?php echo htmlspecialchars($order['price']); ?> 원
-                                </div>
-                                <div class="delivery-fee"> 
-                                    <?php 
-                                        $participants_num = $order['participants_num'];
-                                        $cur_deliver = $order['cur_deliver'];
+    <div class="order-content">
+        <!-- 왼쪽: 이미지 -->
+        <div class="order-left">
+            <img src="../../images/<?php echo htmlspecialchars($order['img']); ?>" alt="<?php echo htmlspecialchars($order['name']); ?>" class="order-img">
+        </div>
 
-                                        // participants_num이 0보다 큰 경우에만 나누기
-                                        if ($participants_num > 0) {
-                                            $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
-                                            echo htmlspecialchars($delivery_fee_per_participant) . " 원";
-                                        } else {
-                                            echo "정보 없음";
-                                        }
-                                    ?>
-                                </div>
-                            </div>
-                            <div class="edit-button-container">
-                                <button class="submit-btn" onclick="window.location.href='../edit_order/edit_order.php?order_id=<?php echo htmlspecialchars($order['order_id']); ?>'">
-                                    Edit
-                                </button>
-                            </div>
+        <!-- 중앙: ORDER DETAIL -->
+        <div class="order-middle">
+            <div class="list-restaurant">
+                <?php echo htmlspecialchars($order['name']); ?>
+            </div>
+            <div class="order-foods">
+                <?php echo htmlspecialchars(implode(", ", $order['foods'])); ?>
+            </div>
+            <div class="order-price">
+                <?php echo htmlspecialchars($order['price']); ?> 원
+            </div>
+        </div>
+
+        <!-- 오른쪽: 배달비 및 EDIT 버튼 -->
+        <div class="order-right">
+        <div class="edit-button-container">
+                <button 
+                    class="submit-btn" 
+                    onclick="window.location.href='../edit_order/edit_order.php?order_id=<?php echo htmlspecialchars($order['order_id']); ?>&price=<?php echo htmlspecialchars($order['price']); ?>'">
+                    Edit
+                </button>
+            </div>
+            <div class="delivery-fee">
+                <span class="delivery-label">지불한 배달비:</span>
+                <?php echo htmlspecialchars($order['cur_deliver']); ?> 원
+            </div>
+            <div class="curdelivery-fee">
+                <span class="delivery-label">현재 배달비:</span>
+                <?php 
+                    $participants_num = $order['participants_num'];
+                    $cur_deliver = $order['cur_deliver'];
+
+                    if ($participants_num > 0) {
+                        $delivery_fee_per_participant = floor($cur_deliver / $participants_num);
+                        echo htmlspecialchars($delivery_fee_per_participant) . " 원";
+                    } else {
+                        echo "정보 없음";
+                    }
+                ?>
+            </div>
+            <div class="delivery-fee">
+                <span class="delivery-label">환불 배달비:</span>
+                <?php echo htmlspecialchars($order['cur_deliver']); ?> 원
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
                         </div>
                     </div>
                 <?php endforeach; ?>
