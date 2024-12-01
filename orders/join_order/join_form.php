@@ -44,6 +44,13 @@ $conn->close();
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // 페이지가 로드되면 메뉴를 자동으로 로드
+            const restId = "<?= $selected_rest_id ?? '' ?>"; // PHP에서 전달된 rest_id
+            calculateFee(restId)
+                .then((curFee) => {
+                    document.getElementById('curfee').value = curFee; // 배달비 업데이트
+                })
+                .catch(error => console.error('Error calculating fee:', error));
+            
             loadMenu();
             updateTotalPrice();  // 초기 총 금액 업데이트
         });
@@ -82,6 +89,23 @@ $conn->close();
             }
         }
 
+        function calculateFee(restId) {
+            return fetch(`../neworder/deliveryfee_loader.php?rest_id=${restId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.sort((a, b) => a.amount - b.amount); // 배달비 데이터를 amount 기준으로 정렬
+                
+                    const feeData = {};
+                    data.forEach(fees => {
+                        feeData[fees.amount] = fees.fee;
+                    });
+                
+                    const curFee = data.reduce((maxFee, feeObj) => Math.max(maxFee, feeObj.fee), 0);
+                
+                    return curFee; // 배달비와 최소 금액 반환
+                });
+        }
+
         function updateTotalPrice() {
             let totalPrice = selectedCurId;
             for (const menuId in menuPrices) {
@@ -95,7 +119,8 @@ $conn->close();
             let goalText = selectedGoalId !== null 
                 ? `목표 금액까지 ${remainingToGoal.toLocaleString()} 원` 
                 : "목표 금액 없음";
-
+  
+            myPrice = myPrice 
             document.getElementById('total-price').innerHTML = `
                 지불할 금액: ${myPrice.toLocaleString()} 원 <br>
                 현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
@@ -186,7 +211,7 @@ $conn->close();
 <div class="container">
     <h2>Join Order</h2>
 
-    <form action="join.php" method="post" >
+    <form action="join.php" method="post" onsubmit="filterAmountInputs()">
         <!-- 식당 선택 및 표시 -->
         <!-- HTML 내 Restaurant Section -->
         <div class="input-group">
@@ -205,7 +230,7 @@ $conn->close();
         
         <!-- 현재 금액 -->
         <div class="input-group">
-            <div id="total-price" style="margin-top: 10px;">
+            <div id="total-price" style="margin-top: 10px;"> 
                 현재 금액: <?= htmlspecialchars($selected_cur_id ?? '0') ?>원
                 (목표 금액  <?= htmlspecialchars($selected_goal_id) ? htmlspecialchars($selected_goal_id) : "목표 금액 없음" ?>원)
             </div>
@@ -213,6 +238,7 @@ $conn->close();
 
         <input type="hidden" id="total-price-hidden" name="total_price" value="0"> <!-- totalPrice 값 -->
         <input type="hidden" id="my-price" name="my_price" value="0"> <!-- myPrice 값 -->
+        <input type="hidden" id="curfee" name="curfee" value="0"> 
         <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id) ?>"> <!-- order_id 값 -->
 
         <!-- 제출 버튼 -->

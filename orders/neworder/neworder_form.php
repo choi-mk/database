@@ -71,6 +71,11 @@ $conn->close();
             if (restId) {
                 const restaurantSelect = document.getElementById("restaurant");
                 restaurantSelect.value = restId; // 전달된 rest_id를 선택값으로 설정
+                calculateFee(restId)
+                    .then((curFee) => {
+                        document.getElementById('curfee').value = curFee; // 배달비 업데이트
+                    })
+                    .catch(error => console.error('Error calculating fee:', error));
                 loadMenu(); // 선택된 레스토랑의 메뉴 로드
             }
         });
@@ -106,6 +111,22 @@ $conn->close();
             } else {
                 menuContainer.innerHTML = '<p>먼저 식당을 선택하세요.</p>';
             }
+        }
+        function calculateFee(restId) {
+            return fetch(`deliveryfee_loader.php?rest_id=${restId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.sort((a, b) => a.amount - b.amount); // 배달비 데이터를 amount 기준으로 정렬
+                
+                    const feeData = {};
+                    data.forEach(fees => {
+                        feeData[fees.amount] = fees.fee;
+                    });
+                
+                    const curFee = data.reduce((maxFee, feeObj) => Math.max(maxFee, feeObj.fee), 0);
+                
+                    return curFee; 
+                });
         }
 
         function updateTotalPrice() {
@@ -249,6 +270,7 @@ $conn->close();
             <label for="goal_money">Delivery Address</label>
             <input type="text" id="delivery_address" name="delivery_address" required>
         </div>
+        <input type="hidden" id="curfee" name="curfee" value="0"> 
         <button type="submit" class="submit-btn">New Order</button>
     </form>
 </div>
