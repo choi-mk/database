@@ -6,11 +6,12 @@ $restaurant = $_POST['restaurant'];
 $time = $_POST['time'];
 $goal_money = $_POST['goal_money'];
 $amount_data = $_POST['amount'];
+$curfee = $_POST['curfee'];
 $phone = $_SESSION['phone'];
 $delivery_address = $_POST['delivery_address'];
 
 // 데이터 유효성 검사 (예: 비어있는 필드가 없는지 확인)
-if (empty($restaurant) || empty($time) || empty($goal_money) || empty($amount_data) || empty($delivery_address)) {
+if (empty($restaurant) || empty($time) || empty($goal_money) || empty($amount_data) || empty($delivery_address) || !isset($curfee)) {
     $error = "모든 필드를 입력해주세요.";
     echo "<script>alert('" . addslashes($error) . "'); history.back();</script>";
     exit;
@@ -66,7 +67,8 @@ if ($stmt->execute()) {
             exit;
         }
     }
-    $success_message = "주문이 접수되었습니다. \n$current_money 원이 등록된 계좌로 결제됩니다.";
+    $current_money = $current_money + $curfee;
+    $success_message = "주문이 접수되었습니다. \n$current_money(배달비 $curfee 원 포함)원이 등록된 계좌로 결제됩니다.";
     echo "<script>
         const message = " . json_encode($success_message) . ";
         alert(message);
