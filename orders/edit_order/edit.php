@@ -6,11 +6,12 @@ $total_price = $_POST['total_price'] ?? null;
 $amount_data = $_POST['amount'] ?? null;
 $my_price = $_POST['my_price'] ?? null;
 $order_id = $_POST['order_id'] ?? null;
+$change = $_POST['change'] ?? null;
 $phone = $_SESSION['phone'] ?? null;
 
 // 데이터 유효성 검사 (예: 비어있는 필드가 없는지 확인)
 // empty($total_price) ||  empty($my_price) || 
-if (empty($restaurant) || empty($total_price) || empty($amount_data) || empty($my_price) || empty($order_id)) {
+if (empty($restaurant) || empty($total_price) || empty($amount_data) || empty($my_price) || empty($order_id) || !isset($change)) {
     $error = "모든 필드를 입력해주세요.";
     echo "<script>";
     echo "alert('{$error}');";
@@ -53,7 +54,15 @@ if ($stmt->execute()) {
                 exit;
             }
         }
-    $success_message = "주문이 접수되었습니다. \n$my_price 원이 등록된 계좌로 결제됩니다.";
+    $change = (int)$change; 
+    $success_message = "주문이 변경되었습니다.";
+    if ($change < 0) {
+        $refundAmount = abs($change);
+        $success_message = "주문이 변경되었습니다. {$refundAmount}원이 환불됩니다.";
+    } elseif ($change > 0) {
+        $additionalPayment = abs($change);
+        $success_message = "주문이 변경되었습니다. {$additionalPayment}원이 추가로 결제됩니다.";
+    }
     echo "<script>
         const message = " . json_encode($success_message) . ";
         alert(message);

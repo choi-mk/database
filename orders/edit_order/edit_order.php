@@ -156,14 +156,25 @@ function updateTotalPrice() {
         : "목표 금액 없음";
 
     // UI 업데이트
+    let change = myPrice - initialPrice;
+    let changeText = '';
+    if (change > 0) {
+        changeText = ` (${change.toLocaleString()} 원 추가 결제 예정)`;
+    } else if (change < 0) {
+        let changeAbs = Math.abs(change)
+        changeText = ` (${changeAbs.toLocaleString()} 원 환불 예정)`;
+    }
+
     document.getElementById('total-price').innerHTML = `
-        지불할 금액: ${myPrice.toLocaleString()} 원 <br>
+        지불한 금액: ${initialPrice.toLocaleString()} 원 <br>
+        내 주문 금액: ${myPrice.toLocaleString()}${changeText} <br>
         현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
     `;
 
     // 숨겨진 input 값 업데이트
     document.getElementById('my-price').value = myPrice;
     document.getElementById('total-price-hidden').value = totalPrice;
+    document.getElementById('change').value = change;
 }
 
 
@@ -271,6 +282,7 @@ function updateTotalPrice() {
         <input type="hidden" id="total-price-hidden" name="total_price" value="0"> <!-- totalPrice 값 -->
         <input type="hidden" id="my-price" name="my_price" value="0"> <!-- myPrice 값 -->
         <input type="hidden" name="order_id" value="<?= htmlspecialchars($order_id) ?>"> <!-- order_id 값 -->
+        <input type="hidden" id="change" name="change" value="0"> <!-- 차액 -->
 
         <div class="input-group">
             <button type="submit" class="submit-btn">Edit Order</button>
