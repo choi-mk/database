@@ -44,6 +44,13 @@ $conn->close();
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // 페이지가 로드되면 메뉴를 자동으로 로드
+            const restId = "<?= $selected_rest_id ?? '' ?>"; // PHP에서 전달된 rest_id
+            calculateFee(restId)
+                .then((curFee) => {
+                    document.getElementById('curfee').value = curFee; // 배달비 업데이트
+                })
+                .catch(error => console.error('Error calculating fee:', error));
+            
             loadMenu();
             updateTotalPrice();  // 초기 총 금액 업데이트
         });
@@ -82,7 +89,7 @@ $conn->close();
             }
         }
 
-        function calculateFee(totalPrice, restId) {
+        function calculateFee(restId) {
             return fetch(`../neworder/deliveryfee_loader.php?rest_id=${restId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -94,10 +101,8 @@ $conn->close();
                     });
                 
                     const curFee = data.reduce((maxFee, feeObj) => Math.max(maxFee, feeObj.fee), 0);
-                    const selectedRestaurant = restaurants.find(r => r.rest_id == restId); // JavaScript에서 restaurants 사용
-                    const minPrice = selectedRestaurant?.minprice || 0;
                 
-                    return { curFee, minPrice }; // 배달비와 최소 금액 반환
+                    return curFee; // 배달비와 최소 금액 반환
                 });
         }
 
@@ -114,15 +119,13 @@ $conn->close();
             let goalText = selectedGoalId !== null 
                 ? `목표 금액까지 ${remainingToGoal.toLocaleString()} 원` 
                 : "목표 금액 없음";
-
-            // myprice에 배달비  
-            myPrice = myPrice + curFee
+  
+            myPrice = myPrice 
             document.getElementById('total-price').innerHTML = `
                 지불할 금액: ${myPrice.toLocaleString()} 원 <br>
                 현재 주문 금액: ${totalPrice.toLocaleString()} 원 (${goalText})
             `;
             document.getElementById('my-price').value = myPrice;
-            document.getElementById('curfee').value = curFee;
             document.getElementById('total-price-hidden').value = totalPrice;
         }
 

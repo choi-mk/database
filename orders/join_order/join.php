@@ -10,7 +10,7 @@ $order_id = $_POST['order_id'] ?? null;
 $phone = $_SESSION['phone'] ?? null;
 
 // 데이터 유효성 검사 (예: 비어있는 필드가 없는지 확인)
-if (empty($restaurant) || empty($total_price) || empty($amount_data) || empty($total_price) || empty($my_price) || empty($order_id) || empty($curfee)) {
+if (empty($restaurant) || empty($total_price) || empty($amount_data) || empty($total_price) || empty($my_price) || empty($order_id) || !isset($curfee)) {
     $error = "모든 필드를 입력해주세요.";
     echo "<script>";
     echo "alert('{$error}');";
