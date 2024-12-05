@@ -23,14 +23,15 @@ $rest_id = isset($_GET['rest_id']) ? htmlspecialchars($_GET['rest_id']) : null;
 
 if ($rest_id) {
     // 전달된 rest_id의 유효성 확인
-    $stmt = $conn->prepare("SELECT name FROM restbl WHERE rest_id = ?");
+    $stmt = $conn->prepare("SELECT name, minprice FROM restbl WHERE rest_id = ?");
     $stmt->bind_param("i", $rest_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $restaurant = $result->fetch_assoc();
-        $selected_restaurant_name = $restaurant['name'];
+        $row = $result->fetch_assoc();
+        $selected_restaurant_name = $row['name'];
+        $restautant[] = $row;
     } else {
         $error_message = "Invalid Restaurant ID.";
     }
@@ -42,7 +43,7 @@ $stmt = $conn->prepare(
     "SELECT r.rest_id, r.name, r.minprice
     FROM restbl r
     JOIN deliverable d ON r.rest_id = d.rest_id
-    WHERE d.phone = ?");
+    WHERE d.phone =?");
 $stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();

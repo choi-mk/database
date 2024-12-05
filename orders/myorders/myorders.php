@@ -318,6 +318,13 @@ $conn->close();
                                     Edit
                                 </button>
                             </div>
+                            <div class="edit-button-container">
+                                <button class="submit-btn" <?php echo ($order['state'] !== 'active') ? 'disabled' : ''; ?> 
+                                onclick="deleteOrder(<?php echo htmlspecialchars($order['order_id']); ?>, <?php echo htmlspecialchars($order['price']); ?>)">
+                                    Delete
+                                </button>
+                            </div>
+
 
                             <div class="delivery-fee">
                                 <span class="delivery-label">지불한 배달비:</span>
@@ -375,5 +382,36 @@ $conn->close();
             <p>No orders found.</p>
         <?php endif; ?>
     </main>
+    <script>
+        function deleteOrder(orderId, price) {
+            if (confirm("Are you sure you want to delete this order?")) {
+                // 데이터를 x-www-form-urlencoded 형식으로 전송
+                const params = new URLSearchParams();
+                params.append('order_id', orderId);
+                params.append('price', price);
+
+                fetch('delete_order.php', {
+                    method: 'POST',
+                    body: params // x-www-form-urlencoded 형식으로 전송
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order deleted successfully.');
+                        location.reload(); // 페이지 새로고침
+                    } else {
+                        alert('Failed to delete order: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the order.');
+                });
+            }
+        }
+
+
+        </script>
+
 </body>
 </html>
